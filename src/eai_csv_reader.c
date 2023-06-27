@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include "ustring.h"
 #include <assert.h>
 
 #include <ulib.h>
@@ -205,6 +206,32 @@ UVec(UString) * eai_csv_reader_next(EaiCsvReader *r)
     uvec_remove_all(UString, &r->_rec);
     eai_csv_reader_rotate(r);
     return eai_csv_reader_emit_record(r);
+}
+
+UVec(UString) * eai_csv_reader_start_record(EaiCsvReader *r, UIStream *istream)
+{
+    UVec(UString) *record = eai_csv_reader_start(r, istream);
+    UVec(UString) *header = ulib_malloc(sizeof(UVec(UString)));
+
+    *header = uvec(UString);
+    uvec_foreach(UString, record, str) {
+        uvec_push(UString, header, ustring_dup(*str.item));
+    }
+
+    return header;
+}
+
+UVec(UString) * eai_csv_reader_next_record(EaiCsvReader *r, UVec(UString) * header)
+{
+    UVec(UString) *record = eai_csv_reader_next(r);
+    if(record == NULL) {
+        uvec_foreach(UString, header, str) {
+            ustring_deinit(str.item);
+        }
+        uvec_deinit(UString, header);
+        free(header);
+    }
+    return record;
 }
 
 // Private impl ================================================================

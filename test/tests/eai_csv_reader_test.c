@@ -358,3 +358,100 @@ bool test_eai_csv_reader_errors(void)
     eai_csv_reader_deinit(&reader);
     return true;
 }
+
+bool test_eai_csv_reader_header(void)
+{
+    const char *eai_csv_reader_test_str =
+        "test, \"test2\", \"a\"test 3\"b\"\n"
+        "1, \"2\", \"3\n"
+        "4,5\"\",6\"\"\"\n"
+        "4,5,6\n"
+        "7,8,\" 9\"\"abc\"";
+
+    const char *eai_csv_reader_test_str_crlf =
+        "test; \"test2\"; \"a\"test 3\"b\"\r\n"
+        "1; \"2\"; \"3\r\n"
+        "4;5\"\";6\"\"\"\r\n"
+        "4;5;6\r\n"
+        "7;8;\" 9\"\"abc\"";
+
+    char expected_header[4][16] = { "test", " test2", " atest 3b" };
+
+    char expected[3][4][16] = { { "1", " 2", " 3\n4,5\",6\"" },
+                                { "4", "5", "6" },
+                                { "7", "8", " 9\"abc" } };
+
+    char expected_crlf[3][4][16] = { { "1", " 2", " 3\r\n4;5\";6\"" },
+                                     { "4", "5", "6" },
+                                     { "7", "8", " 9\"abc" } };
+
+    ulib_uint i;
+
+    int expected_length[] = { 3, 3, 3, 3 };
+
+    UIStream csv_stream;
+    ustream_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
+    utest_assert(ret == USTREAM_OK);
+
+    // No CRLF
+    EaiCsvReader reader = eai_csv_reader(',', false);
+    i = 0;
+
+    eai_csv_reader_foreach_record(&reader, &csv_stream, header, record)
+    {
+        utest_assert(record != NULL);
+        utest_assert(header != NULL);
+
+        uvec_foreach(UString, header, field) {
+            UString expected_field = ustring_wrap(expected_header[field.i],
+                                                  strlen(expected_header[field.i]));
+            utest_assert_ustring(*field.item, ==, expected_field);
+        }
+
+        uvec_foreach(UString, record, field) {
+            UString expected_field = ustring_wrap(expected[i][field.i],
+                                                  strlen(expected[i][field.i]));
+            utest_assert_ustring(*field.item, ==, expected_field);
+        }
+
+        utest_assert_int(uvec_count(UString, record), ==, expected_length[i]);
+        i++;
+    }
+
+    utest_assert_int(i, ==, 3);
+    utest_assert(eai_csv_reader_state(&reader) == EAI_CSV_READER_OK);
+    eai_csv_reader_deinit(&reader);
+    uistream_deinit(&csv_stream);
+
+    // No CRLF
+    ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str_crlf);
+    utest_assert(ret == USTREAM_OK);
+    reader = eai_csv_reader(';', true);
+
+    i = 0;
+    eai_csv_reader_foreach_record(&reader, &csv_stream, header, record)
+    {
+        utest_assert(record != NULL);
+
+        uvec_foreach(UString, header, field) {
+            UString expected_field = ustring_wrap(expected_header[field.i],
+                                                  strlen(expected_header[field.i]));
+            utest_assert_ustring(*field.item, ==, expected_field);
+        }
+
+        uvec_foreach(UString, record, field) {
+            UString expected_field = ustring_wrap(expected_crlf[i][field.i],
+                                                  strlen(expected_crlf[i][field.i]));
+            utest_assert_ustring(*field.item, ==, expected_field);
+        }
+
+        utest_assert_int(uvec_count(UString, record), ==, expected_length[i]);
+        i++;
+    }
+
+    utest_assert_int(i, ==, 3);
+    utest_assert(eai_csv_reader_state(&reader) == EAI_CSV_READER_OK);
+    eai_csv_reader_deinit(&reader);
+    uistream_deinit(&csv_stream);
+    return true;
+}

@@ -107,6 +107,27 @@ void eai_csv_reader_deinit(EaiCsvReader *reader);
         record_identifier = eai_csv_reader_next(reader))
 
 /**
+ * A for-like loop that iterates through the record of the the given input stream
+ * Unlike eai_csv_reader_foreach, it exposes a second vector containing the header
+ * of the csv
+ *
+ *
+ * @example eai_csv_reader_foreach(reader, uistream, record) {
+ *      // Do things with UVec(UString) *record
+ * }
+ *
+ * @param reader the reader
+ * @param uistream the input stream
+ * @param record_identifier the name will be assigned to the UVec(UString) * instance in order to be
+ *                          accessible inside the loop
+ */
+#define eai_csv_reader_foreach_record(reader, uistream, header_identifier, record_identifier)      \
+    for(UVec(UString) *header_identifier = eai_csv_reader_start_record(reader, uistream),          \
+                      *record_identifier = eai_csv_reader_next_record(reader, header_identifier);  \
+        record_identifier != NULL;                                                                 \
+        record_identifier = eai_csv_reader_next_record(reader, header_identifier))
+
+/**
  * Start reading a csv from the specified input stream
  * User should not use those function. Use eai_csv_reader_foreach instead
  * @param r the reader
@@ -120,8 +141,29 @@ UVec(UString) * eai_csv_reader_start(EaiCsvReader *r, UIStream *istream);
  * When calling this function, the previous record pointer becomes invalid
  * User should not use this function. Use eai_csv_reader_foreach instead
  * @param r
- * @return
+ * @return a reference to the next record, NULL if none exists
  */
 UVec(UString) * eai_csv_reader_next(EaiCsvReader *r);
+
+/**
+ * Start reading a csv from the specified input stream, copy first record
+ * in header vector
+ * User should not use those function. Use eai_csv_reader_foreach instead
+ * @param r the reader
+ * @param istream the input stream
+ * @return a reference to the first record
+ */
+UVec(UString) * eai_csv_reader_start_record(EaiCsvReader *r, UIStream *istream);
+
+/**
+ * Slide the buffer and get the next record
+ * When calling this function, the previous record pointer becomes invalid
+ * If no record is available, the function deallocates the header vector
+ * User should not use this function. Use eai_csv_reader_foreach instead
+ * @param r
+ * @param header the header pointer, required to release memory at the end of the loop
+ * @return a reference to the next record, NULL if none exists
+ */
+UVec(UString) * eai_csv_reader_next_record(EaiCsvReader *r, UVec(UString) * header);
 
 #endif // eai_csv__CSV_H
