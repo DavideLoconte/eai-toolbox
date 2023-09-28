@@ -16,10 +16,10 @@ check_ipo_supported(RESULT result)
 if (result)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Dependencies (ulib)
+
 if (NOT TARGET ulib)
     include(FetchContent)
     message("-- Fetching ulib")
@@ -46,7 +46,7 @@ file(GLOB EAI_TOOLBOX_CLI_SOURCES "${EAI_TOOLBOX_CLI_DIR}/*.c")
 if (MSVC)
     set(EAI_TOOLBOX_COMPILE_OPTS /W3)
 else ()
-    set(EAI_TOOLBOX_COMPILE_OPTS -Wall -Wextra -Wpedantic -Wformat=2)
+    set(EAI_TOOLBOX_COMPILE_OPTS -Wall -Wextra -Wformat=2)
     set(EAI_TOOLBOX_ASAN_COMPILE_OPTS -fsanitize=address -fno-omit-frame-pointer -fno-common -g -O0)
 endif ()
 
@@ -75,3 +75,4 @@ if (NOT MSVC)
     set_target_properties(eai-toolbox-test-asan PROPERTIES EXCLUDE_FROM_ALL True)
     target_link_options(eai-toolbox-test-asan PRIVATE -fsanitize=address)
 endif()
+

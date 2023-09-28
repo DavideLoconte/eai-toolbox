@@ -35,8 +35,6 @@ EaiRegressionMetrics eai_regression_metrics(void)
     return metrics;
 }
 
-void eai_regression_metrics_deinit(EaiRegressionMetrics *metrics) {}
-
 void eai_regression_metrics_add(EaiRegressionMetrics *metrics,
                                 ulib_float actual,
                                 ulib_float predicted)

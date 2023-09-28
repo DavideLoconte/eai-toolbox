@@ -101,7 +101,7 @@ void eai_csv_reader_deinit(EaiCsvReader *reader);
  * @param record_identifier the name will be assigned to the UVec(UString) * instance in order to be
  *                          accessible inside the loop
  */
-#define eai_csv_reader_foreach(reader, uistream, record_identifier)                                \
+#define eai_csv_reader_foreach_record(reader, uistream, record_identifier)                         \
     for(UVec(UString) *record_identifier = eai_csv_reader_start(reader, uistream);                 \
         record_identifier != NULL;                                                                 \
         record_identifier = eai_csv_reader_next(reader))
@@ -121,7 +121,7 @@ void eai_csv_reader_deinit(EaiCsvReader *reader);
  * @param record_identifier the name will be assigned to the UVec(UString) * instance in order to be
  *                          accessible inside the loop
  */
-#define eai_csv_reader_foreach_record(reader, uistream, header_identifier, record_identifier)      \
+#define eai_csv_reader_foreach(reader, uistream, header_identifier, record_identifier)             \
     for(UVec(UString) *header_identifier = eai_csv_reader_start_record(reader, uistream),          \
                       *record_identifier = eai_csv_reader_next_record(reader, header_identifier);  \
         record_identifier != NULL;                                                                 \

@@ -43,7 +43,7 @@ bool test_eai_csv_reader1(void)
     // No CRLF
     EaiCsvReader reader = eai_csv_reader(',', false);
     i = 0;
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         utest_assert(record != NULL);
         uvec_foreach(UString, record, field) {
             UString expected_field = ustring_wrap(expected[i][field.i],
@@ -64,7 +64,7 @@ bool test_eai_csv_reader1(void)
     reader = eai_csv_reader(';', true);
 
     i = 0;
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         utest_assert(record != NULL);
 
         uvec_foreach(UString, record, field) {
@@ -112,7 +112,7 @@ bool test_eai_csv_reader2(void)
     // No CRLF
     EaiCsvReader reader = eai_csv_reader('\t', false);
     i = 0;
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         utest_assert(record != NULL);
         uvec_foreach(UString, record, field) {
             UString expected_field = ustring_wrap(expected[i][field.i],
@@ -133,7 +133,7 @@ bool test_eai_csv_reader2(void)
     reader = eai_csv_reader('\t', true);
 
     i = 0;
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         utest_assert(record != NULL);
         uvec_foreach(UString, record, field) {
             UString expected_field = ustring_wrap(expected[i][field.i],
@@ -183,7 +183,7 @@ bool test_eai_csv_reader3(void)
 
     EaiCsvReader reader = eai_csv_reader(',', false);
     i = 0;
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         utest_assert(record != NULL);
         uvec_foreach(UString, record, field) {
             UString expected_field = ustring_wrap(expected[i][field.i],
@@ -204,7 +204,7 @@ bool test_eai_csv_reader3(void)
     reader = eai_csv_reader(',', true);
 
     i = 0;
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         utest_assert(record != NULL);
         uvec_foreach(UString, record, field) {
             UString expected_field = ustring_wrap(expected_crlf[i][field.i],
@@ -296,7 +296,7 @@ bool test_eai_csv_reader_multiple(void)
     UIStream csv_stream;
     uistream_from_string(&csv_stream, eai_csv_reader_test_str_0);
     ulib_uint i = 0;
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         utest_assert(record != NULL);
         uvec_foreach(UString, record, field) {
             UString expected_field = ustring_wrap(expected_0[i][field.i],
@@ -313,7 +313,7 @@ bool test_eai_csv_reader_multiple(void)
     i = 0;
     size_t j = 0;
     uistream_from_string(&csv_stream, eai_csv_reader_test_str_1);
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         // Fragment memory
         char *dummy_buffers[64];
         for(j = 0; j < 64; j++) {
@@ -348,7 +348,7 @@ bool test_eai_csv_reader_errors(void)
 
     // No CRLF
     EaiCsvReader reader = eai_csv_reader(',', false);
-    eai_csv_reader_foreach(&reader, &csv_stream, record) {
+    eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
         return false;
     }
     EaiCsvReaderError state = eai_csv_reader_state(&reader);
@@ -397,7 +397,7 @@ bool test_eai_csv_reader_header(void)
     EaiCsvReader reader = eai_csv_reader(',', false);
     i = 0;
 
-    eai_csv_reader_foreach_record(&reader, &csv_stream, header, record)
+    eai_csv_reader_foreach(&reader, &csv_stream, header, record)
     {
         utest_assert(record != NULL);
         utest_assert(header != NULL);
@@ -429,7 +429,7 @@ bool test_eai_csv_reader_header(void)
     reader = eai_csv_reader(';', true);
 
     i = 0;
-    eai_csv_reader_foreach_record(&reader, &csv_stream, header, record)
+    eai_csv_reader_foreach(&reader, &csv_stream, header, record)
     {
         utest_assert(record != NULL);
 

@@ -42,12 +42,6 @@ typedef struct EaiRegressionMetrics_s {
 EaiRegressionMetrics eai_regression_metrics(void);
 
 /**
- * Deinit metrics structure. Currently is a no-op
- * @param metrics
- */
-void eai_regression_metrics_deinit(EaiRegressionMetrics *metrics);
-
-/**
  * Add a prediction to the EaiRegressionMetrics structure
  * @param metrics the structure
  * @param actual the real value

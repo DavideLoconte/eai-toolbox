@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef EAI_TOOLBOX_EAI_PROCESS_H
-#define EAI_TOOLBOX_EAI_PROCESS_H
+#ifndef EAI_TOOLBOX_EAI_PROFILE_H
+#define EAI_TOOLBOX_EAI_PROFILE_H
 
 #include <ulib.h>
 
@@ -46,4 +46,4 @@ ulib_uint eai_profile_get_resident_memory(void);
  */
 void eai_profile_sleep(ulib_uint seconds);
 
-#endif // EAI_TOOLBOX_EAI_PROCESS_H
+#endif // EAI_TOOLBOX_EAI_PROFILE_H
