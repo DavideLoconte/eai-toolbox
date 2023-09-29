@@ -45,16 +45,18 @@ file(GLOB EAI_TOOLBOX_CLI_SOURCES "${EAI_TOOLBOX_CLI_DIR}/*.c")
 # compile opts
 if (MSVC)
     set(EAI_TOOLBOX_COMPILE_OPTS /W3)
+    set(EAI_TOOLBOX_LIBS ulib)
 else ()
     set(EAI_TOOLBOX_COMPILE_OPTS -Wall -Wextra -Wformat=2)
     set(EAI_TOOLBOX_ASAN_COMPILE_OPTS -fsanitize=address -fno-omit-frame-pointer -fno-common -g -O0)
+    set(EAI_TOOLBOX_LIBS ulib m)
 endif ()
 
 # TARGETS
 
 # Library
 add_library(eai-toolbox ${EAI_TOOLBOX_SOURCES})
-target_link_libraries(eai-toolbox PUBLIC ulib)
+target_link_libraries(eai-toolbox PUBLIC ${EAI_TOOLBOX_LIBS})
 target_include_directories(eai-toolbox PUBLIC ${EAI_TOOLBOX_HEADERS_DIR})
 target_compile_options(eai-toolbox PUBLIC ${EAI_TOOLBOX_COMPILE_OPTS})
 

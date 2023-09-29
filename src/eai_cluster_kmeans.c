@@ -48,6 +48,7 @@ void eai_cluster_deinit(EaiClusterResults *results)
     uvec_foreach(UVec(ulib_float), &results->centroids, centroid) {
         uvec_deinit(ulib_float, centroid.item);
     }
+
     uvec_deinit(UVec(ulib_float), &results->centroids);
     uvec_deinit(ulib_uint, &results->cluster_size);
     uvec_deinit(ulib_uint, &results->cluster);
@@ -55,11 +56,11 @@ void eai_cluster_deinit(EaiClusterResults *results)
 
 // Private impl ===============================================================
 
-UVEC_IMPL(UVec(ulib_float))
+UVEC_IMPL(UVec(ulib_float));
 
 void assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) *data)
 {
-    ulib_uint n_clusters = uvec_count(ulib_uint, &results->cluster);
+    ulib_uint n_clusters = uvec_count(UVec(ulib_float), &results->centroids);
     
     uvec_foreach(ulib_uint, &results->cluster_size, value) {
         *value.item = 0;
@@ -80,7 +81,7 @@ void assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) *data)
         ulib_uint previous_cluster_size = uvec_get(ulib_uint, &results->cluster_size, min_cluster);
         uvec_set(ulib_uint, &results->cluster, sample.i, min_cluster);
         uvec_set(ulib_uint, &results->cluster_size, min_cluster, previous_cluster_size + 1);
-    }
+    }    
 }
 
 void reinit_centroids(EaiClusterResults *results) 
@@ -114,7 +115,6 @@ ulib_float update_kmeans(EaiClusterResults *results, UVec(UVec(ulib_float)) *dat
             *x.item /= cluster_size;
         }
     } 
-
     return update;
 }
 
