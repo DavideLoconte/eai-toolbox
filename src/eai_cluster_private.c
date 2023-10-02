@@ -54,3 +54,29 @@ ulib_float eai_squared_distance(UVec(ulib_float) * a, UVec(ulib_float) * b)
     return dist;
 }
 
+void eai_assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) *data)
+{
+    ulib_uint n_clusters = uvec_count(UVec(ulib_float), &results->centroids);
+    
+    uvec_foreach(ulib_uint, &results->cluster_size, value) {
+        *value.item = 0;
+    }
+    
+    uvec_foreach(UVec(ulib_float), data, sample) {
+        ulib_uint min_cluster;
+        ulib_float min_distance = ULIB_FLOAT_MAX;
+        
+        for (ulib_uint i = 0; i < n_clusters; i++) {
+            UVec(ulib_float) *centroid = &uvec_get(UVec(ulib_float), &results->centroids, i);
+            ulib_float d = eai_distance(sample.item, centroid);
+            if (d < min_distance) {
+                min_distance = d;
+                min_cluster = i;
+            }
+        } 
+        ulib_uint previous_cluster_size = uvec_get(ulib_uint, &results->cluster_size, min_cluster);
+        uvec_set(ulib_uint, &results->cluster, sample.i, min_cluster);
+        uvec_set(ulib_uint, &results->cluster_size, min_cluster, previous_cluster_size + 1);
+    }    
+}
+

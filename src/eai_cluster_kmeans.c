@@ -1,14 +1,6 @@
 #include <stdlib.h>
 
 #include "eai_cluster_private.h"
-
-/**
- * Assing each data point to its cluster
- * @param result the clustering results data structure
- * @param data the data
- */
-static void assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) *data);
-
 /**
  * Assing each data point to its cluster
  * @param result the clustering results data structure
@@ -36,7 +28,7 @@ EaiClusterResults eai_cluster_kmeans(EaiKMeansConfig *config, UVec(UVec(ulib_flo
     eai_select_random_centroids(&results, data, config->n_clusters);
 
     for (ulib_uint i = 0; i < config->max_iter; i++) {
-        assign_clusters(&results, data);
+        eai_assign_clusters(&results, data);
         update_kmeans(&results, data);
     }
 
@@ -57,32 +49,6 @@ void eai_cluster_deinit(EaiClusterResults *results)
 // Private impl ===============================================================
 
 UVEC_IMPL(UVec(ulib_float));
-
-void assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) *data)
-{
-    ulib_uint n_clusters = uvec_count(UVec(ulib_float), &results->centroids);
-    
-    uvec_foreach(ulib_uint, &results->cluster_size, value) {
-        *value.item = 0;
-    }
-    
-    uvec_foreach(UVec(ulib_float), data, sample) {
-        ulib_uint min_cluster;
-        ulib_float min_distance = ULIB_FLOAT_MAX;
-        
-        for (ulib_uint i = 0; i < n_clusters; i++) {
-            UVec(ulib_float) *centroid = &uvec_get(UVec(ulib_float), &results->centroids, i);
-            ulib_float d = eai_distance(sample.item, centroid);
-            if (d < min_distance) {
-                min_distance = d;
-                min_cluster = i;
-            }
-        } 
-        ulib_uint previous_cluster_size = uvec_get(ulib_uint, &results->cluster_size, min_cluster);
-        uvec_set(ulib_uint, &results->cluster, sample.i, min_cluster);
-        uvec_set(ulib_uint, &results->cluster_size, min_cluster, previous_cluster_size + 1);
-    }    
-}
 
 void reinit_centroids(EaiClusterResults *results) 
 {

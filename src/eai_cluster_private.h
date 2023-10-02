@@ -35,5 +35,11 @@ ulib_float eai_distance(UVec(ulib_float) *a, UVec(ulib_float) *b);
  */
 ulib_float eai_squared_distance(UVec(ulib_float) *a, UVec(ulib_float) *b);
 
+/**
+ * Assing each data point to its cluster
+ * @param result the clustering results data structure
+ * @param data the data
+ */
+void eai_assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) *data);
 
 #endif
