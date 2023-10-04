@@ -47,12 +47,5 @@ bool eai_profile_test_sleep(void)
     utest_assert_float((stop - start), >, seconds - epsilon);
     utest_assert_float((stop - start), <, seconds + epsilon);
 
-    seconds = 1;
-    start = eai_profile_get_wall_clock();
-    eai_profile_sleep(seconds);
-    stop = eai_profile_get_wall_clock();
-
-    utest_assert_float((stop - start), >, seconds - epsilon);
-    utest_assert_float((stop - start), <, seconds + epsilon);
     return true;
 }

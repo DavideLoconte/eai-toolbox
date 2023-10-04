@@ -70,6 +70,8 @@ bool test_eai_cluster_kmeans2(void)
     ulib_uint errors = 0;
     EaiKMeansConfig config = eai_cluster_kmeans_config();
     config.n_clusters = 3;
+    config.max_iter = 1000;
+    config.seed = 1;
 
     EaiClusterResults cluster_results = eai_cluster_kmeans(&config, &data);
 
@@ -84,11 +86,10 @@ bool test_eai_cluster_kmeans2(void)
         }
     }
 
-    utest_assert(errors <= 3);
-    if(errors != 0) {
-        printf("Warning: %u points are assigned to wrong cluster \n", errors);
+    if(errors) {
+        printf("Errors: %u\n", errors);
     }
-    
+
     utest_assert_uint(errors, ==, 0);
     teardown_data(&data);
     eai_cluster_deinit(&cluster_results);
@@ -126,6 +127,10 @@ bool test_eai_cluster_kmeans3(void)
         if(cluster != expected_clusters[_cluster.i]) {
             errors += 1;
         }
+    }
+
+    if(errors) {
+        printf("Errors: %u\n", errors);
     }
 
     utest_assert_uint(errors, ==, 0);
@@ -230,7 +235,6 @@ bool test_eai_cluster_kmedoids3(void)
     EaiClusterResults cluster_results = eai_cluster_kmedoids(&config, &data);
 
     uvec_foreach(ulib_uint, &cluster_results.cluster, _cluster) {
-
         ulib_uint cluster = mapping[*_cluster.item];
         if(cluster == (ulib_uint) -1) {
             cluster = mapping[*_cluster.item] = expected_clusters[_cluster.i];
