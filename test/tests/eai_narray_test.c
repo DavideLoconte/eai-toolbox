@@ -1,9 +1,5 @@
 #include "eai_narray.h"
-
-EAI_NARRAY_DECL(ulib_float);
-EAI_NARRAY_DECL(ulib_uint);
-EAI_NARRAY_IMPL(ulib_float);
-EAI_NARRAY_IMPL(ulib_uint);
+#include "eai_narray_builtin.h"
 
 bool eai_narray_base_test(void)
 {

@@ -181,5 +181,5 @@
  */
 #define eai_narray_deinit(type, array) eai_narray_deinit_##type(array)
 
-#endif
 
+#endif
