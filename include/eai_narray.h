@@ -28,8 +28,6 @@
 #include <stdarg.h>
 #include <ulib.h>
 
-#define TYPE ulib_float
-
 /**
  * Declares a new n-dimensional array type
  * @param TYPE array type
@@ -43,7 +41,7 @@
     EaiNArray_##TYPE eai_narray_##TYPE(ulib_uint dimensions, ...);                                 \
     TYPE eai_narray_get_##TYPE(EaiNArray_##TYPE *na, ...);                                         \
     TYPE *eai_narray_get_ref_##TYPE(EaiNArray_##TYPE *na, ...);                                    \
-    TYPE eai_narray_set_##TYPE(EaiNArray_##TYPE *na, ...);                                         \
+    TYPE eai_narray_set_##TYPE(EaiNArray_##TYPE *na, TYPE val, ...);                               \
     void eai_narray_deinit_##TYPE(EaiNArray_##TYPE *na);
 
 /**
@@ -108,22 +106,21 @@
         return &uvec_get(TYPE, &na->storage, index);                                               \
     }                                                                                              \
                                                                                                    \
-    TYPE eai_narray_set_##TYPE(EaiNArray_##TYPE *na, ...)                                          \
+    TYPE eai_narray_set_##TYPE(EaiNArray_##TYPE *na, TYPE val, ...)                                \
     {                                                                                              \
         ulib_uint index = 0;                                                                       \
         TYPE old_val;                                                                              \
                                                                                                    \
         va_list argptr;                                                                            \
-        va_start(argptr, na);                                                                      \
+        va_start(argptr, val);                                                                     \
                                                                                                    \
         uvec_foreach(ulib_uint, &na->shape, dim) {                                                 \
             index = index * (*dim.item) + va_arg(argptr, ulib_uint);                               \
         }                                                                                          \
-                                                                                                   \
-        old_val = uvec_get(TYPE, &na->storage, index);                                             \
-        uvec_set(TYPE, &na->storage, index, va_arg(argptr, TYPE));                                 \
         va_end(argptr);                                                                            \
                                                                                                    \
+        old_val = uvec_get(TYPE, &na->storage, index);                                             \
+        uvec_set(TYPE, &na->storage, index, val);                                                  \
         return old_val;                                                                            \
     }                                                                                              \
                                                                                                    \
@@ -167,12 +164,11 @@
 /**
  * @param type the type of data stored in the elements of the array
  * @param na the n-dimensional array
- * @param ... a list of n+1 arguments, where the first n are the coordinates of
- *            the element for each dimension and the n+1-th element is the value
- *            to set
+ * @param val the value to set
+ * @param ... the coordinates of the element for each dimension
  * @return the replaced value
  */
-#define eai_narray_set(type, array, ...) eai_narray_set_##type(array, __VA_ARGS__)
+#define eai_narray_set(type, array, val, ...) eai_narray_set_##type(array, val, __VA_ARGS__)
 
 /**
  * Deinit a n-dimensional array
@@ -180,6 +176,5 @@
  * @param na the array
  */
 #define eai_narray_deinit(type, array) eai_narray_deinit_##type(array)
-
 
 #endif

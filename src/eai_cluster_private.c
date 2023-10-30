@@ -1,4 +1,7 @@
 #include "eai_cluster_private.h"
+#include "ustrbuf.h"
+#include "uvec_builtin.h"
+
 
 void eai_init_clustering(EaiClusterResults *results, UVec(UVec(ulib_float)) * data)
 {
@@ -13,7 +16,6 @@ void eai_init_clustering(EaiClusterResults *results, UVec(UVec(ulib_float)) * da
     }
 }
 
-#define SAMPLES 8
 void eai_select_random_centroids(EaiClusterResults *results,
                                  UVec(UVec(ulib_float)) * data,
                                  ulib_uint n_cluster)
@@ -21,46 +23,19 @@ void eai_select_random_centroids(EaiClusterResults *results,
     const ulib_uint data_count = uvec_count(UVec(ulib_float), data);
     UVec(ulib_uint) clusters = uvec(ulib_uint);
 
-    ulib_uint cluster = rand() % data_count;
-    uvec_insert_sorted(ulib_uint, &clusters, cluster, NULL);
-    UVec(ulib_float) centroid = uvec(ulib_float);
-    UVec(ulib_float) *data_point = &uvec_get(UVec(ulib_float), data, cluster);
-    uvec_copy(ulib_float, data_point, &centroid);
-    uvec_push(UVec(ulib_float), &results->centroids, centroid);
-    uvec_push(ulib_uint, &results->cluster_size, 0);
+    while(uvec_count(ulib_uint, &clusters) < n_cluster) {
+        uvec_insert_sorted_unique(ulib_uint, &clusters, rand() % data_count, NULL);
+    }
 
-    while(uvec_count(UVec(ulib_float), &results->centroids) < n_cluster) {
-        ulib_float max_dist = -1;
-        ulib_uint candidate_cluster[SAMPLES] = { rand() % data_count, rand() % data_count,
-                                                 rand() % data_count, rand() % data_count,
-                                                 rand() % data_count, rand() % data_count,
-                                                 rand() % data_count, rand() % data_count };
-
-        cluster = 0;
-        UVec(ulib_float) last_cluster = uvec_last(UVec(ulib_float), &results->centroids);
-
-        for(ulib_uint i = 0; i < SAMPLES; i++) {
-            while(uvec_contains_sorted(ulib_uint, &clusters, candidate_cluster[i])) {
-                candidate_cluster[i] += (rand() % 6) - 3;
-                candidate_cluster[i] %= data_count;
-            }
-
-            UVec(ulib_float) *data_point = &uvec_get(UVec(ulib_float), data, cluster);
-            ulib_float dist = eai_distance(data_point, &last_cluster);
-            if(dist > max_dist) {
-                max_dist = dist;
-                cluster = candidate_cluster[i];
-            }
-        }
-
-        uvec_insert_sorted(ulib_uint, &clusters, cluster, NULL);
+    uvec_foreach(ulib_uint, &clusters, x) {
         UVec(ulib_float) centroid = uvec(ulib_float);
-        UVec(ulib_float) *data_point = &uvec_get(UVec(ulib_float), data, cluster);
+        UVec(ulib_float) *data_point = &uvec_get(UVec(ulib_float), data, *x.item);
 
         uvec_copy(ulib_float, data_point, &centroid);
         uvec_push(UVec(ulib_float), &results->centroids, centroid);
         uvec_push(ulib_uint, &results->cluster_size, 0);
     }
+
     uvec_deinit(ulib_uint, &clusters);
 }
 
@@ -83,7 +58,6 @@ ulib_float eai_squared_distance(UVec(ulib_float) * a, UVec(ulib_float) * b)
 void eai_assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) * data)
 {
     ulib_uint n_clusters = uvec_count(UVec(ulib_float), &results->centroids);
-
     uvec_foreach(ulib_uint, &results->cluster_size, value) {
         *value.item = 0;
     }
@@ -95,6 +69,7 @@ void eai_assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) * da
         for(ulib_uint i = 0; i < n_clusters; i++) {
             UVec(ulib_float) *centroid = &uvec_get(UVec(ulib_float), &results->centroids, i);
             ulib_float d = eai_distance(sample.item, centroid);
+
             if(d <= min_distance) {
                 min_distance = d;
                 min_cluster = i;
@@ -103,7 +78,7 @@ void eai_assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) * da
 
         ulib_uint previous_cluster_size = uvec_get(ulib_uint, &results->cluster_size, min_cluster);
         uvec_set(ulib_uint, &results->cluster, sample.i, min_cluster);
-        uvec_set(ulib_uint, &results->cluster_size, min_cluster, previous_cluster_size + 1);
+        uvec_set(ulib_uint, &results->cluster_size, min_cluster, (previous_cluster_size + 1));
     }
 }
 

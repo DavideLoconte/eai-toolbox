@@ -10,7 +10,6 @@ bool eai_narray_base_test(void)
     return true;
 }
 
-
 bool eai_narray_get_test(void)
 { 
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
@@ -46,8 +45,8 @@ bool eai_narray_set_test(void)
         ulib_uint new_value_2 = rand();
         ulib_float new_value_1 = (ulib_float) new_value_2 / 100.0; 
  
-        ulib_float replaced_value_1 = eai_narray_set(ulib_float, &array, idx_1[0], idx_1[1], idx_1[2], new_value_1);
-        ulib_uint replaced_value_2 = eai_narray_set(ulib_uint, &array2, idx_2[0], idx_2[1], idx_2[2], idx_2[3], idx_2[4], idx_2[5], idx_2[6], idx_2[7], idx_2[8], idx_2[9], new_value_2); 
+        ulib_float replaced_value_1 = eai_narray_set(ulib_float, &array, new_value_1, idx_1[0], idx_1[1], idx_1[2]);
+        ulib_uint replaced_value_2 = eai_narray_set(ulib_uint, &array2, new_value_2, idx_2[0], idx_2[1], idx_2[2], idx_2[3], idx_2[4], idx_2[5], idx_2[6], idx_2[7], idx_2[8], idx_2[9]); 
  
         utest_assert_float(replaced_value_1, ==, old_value_1);
         utest_assert_uint(replaced_value_2, ==, old_value_2);

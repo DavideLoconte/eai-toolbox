@@ -7,7 +7,7 @@
  * @param data the data
  * @return the Frobenius norm of the difference in the cluster centers before and after the update
  */
-static ulib_float update_kmeans(EaiClusterResults *results, UVec(UVec(ulib_float)) * data);
+static void update_kmeans(EaiClusterResults *results, UVec(UVec(ulib_float)) * data);
 
 // Public impl =================================================================
 
@@ -63,16 +63,13 @@ void reinit_centroids(EaiClusterResults *results)
     }
 }
 
-ulib_float update_kmeans(EaiClusterResults *results, UVec(UVec(ulib_float)) * data)
+void update_kmeans(EaiClusterResults *results, UVec(UVec(ulib_float)) * data)
 {
-    ulib_float update = 0.0;
     reinit_centroids(results);
 
     uvec_foreach(UVec(ulib_float), data, sample) {
-        ulib_uint sample_cluster = uvec_get(ulib_uint, &results->cluster, sample.i);
-        UVec(ulib_float) *centroid = &uvec_get(UVec(ulib_float),
-                                               &results->centroids,
-                                               sample_cluster);
+        ulib_uint cluster = uvec_get(ulib_uint, &results->cluster, sample.i);
+        UVec(ulib_float) *centroid = &uvec_get(UVec(ulib_float), &results->centroids, cluster);
         uvec_foreach(ulib_float, centroid, x) {
             *x.item += uvec_get(ulib_float, sample.item, x.i);
         }
@@ -86,6 +83,5 @@ ulib_float update_kmeans(EaiClusterResults *results, UVec(UVec(ulib_float)) * da
             *x.item /= (ulib_float) cluster_size;
         }
     }
-    return update;
 }
 
