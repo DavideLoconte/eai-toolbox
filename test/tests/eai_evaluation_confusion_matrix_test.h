@@ -5,8 +5,7 @@
 #ifndef EAI_TOOLBOX_EAI_EVALUATION_CONFUSION_MATRIX_H
 #define EAI_TOOLBOX_EAI_EVALUATION_CONFUSION_MATRIX_H
 
-#include "eai_confusion_matrix.h"
-#include <stdbool.h>
+#include <ulib.h>
 
 bool test_eai_confusion_matrix_scores_accuracy_1(void);
 bool test_eai_confusion_matrix_scores_accuracy_05(void);

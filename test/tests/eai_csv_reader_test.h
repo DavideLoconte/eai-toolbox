@@ -5,6 +5,8 @@
 #ifndef EAI_TOOLBOX_EAI_CSV_READER_TEST_H
 #define EAI_TOOLBOX_EAI_CSV_READER_TEST_H
 
+#include <ulib.h>
+
 bool test_eai_csv_reader1(void);
 bool test_eai_csv_reader2(void);
 bool test_eai_csv_reader3(void);

@@ -1,8 +1,7 @@
 //
 // Created by DavideLoconte on 25-Nov-22.
 //
-
-#include "eai_evaluation_confusion_matrix_test.h"
+#include <eai_confusion_matrix.h>
 
 bool test_eai_confusion_matrix_scores_accuracy_1(void)
 {

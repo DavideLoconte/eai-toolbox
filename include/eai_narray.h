@@ -42,7 +42,9 @@
     TYPE eai_narray_get_##TYPE(EaiNArray_##TYPE *na, ...);                                         \
     TYPE *eai_narray_get_ref_##TYPE(EaiNArray_##TYPE *na, ...);                                    \
     TYPE eai_narray_set_##TYPE(EaiNArray_##TYPE *na, TYPE val, ...);                               \
-    void eai_narray_deinit_##TYPE(EaiNArray_##TYPE *na);
+    void eai_narray_deinit_##TYPE(EaiNArray_##TYPE *na);                                           \
+    ulib_uint eai_narray_count_##TYPE(EaiNArray_##TYPE *na, ulib_uint axis);                       \
+    ulib_uint eai_narray_axes_##TYPE(EaiNArray_##TYPE *na);
 
 /**
  * Implements a previously declared n dimensional array type
@@ -128,6 +130,16 @@
     {                                                                                              \
         uvec_deinit(TYPE, &na->storage);                                                           \
         uvec_deinit(ulib_uint, &na->shape);                                                        \
+    }                                                                                              \
+                                                                                                   \
+    ulib_uint eai_narray_count_##TYPE(EaiNArray_##TYPE *na, ulib_uint axis)                        \
+    {                                                                                              \
+        return uvec_get(ulib_uint, &na->shape, axis);                                              \
+    }                                                                                              \
+                                                                                                   \
+    ulib_uint eai_narray_axes_##TYPE(EaiNArray_##TYPE *na)                                         \
+    {                                                                                              \
+        return uvec_count(ulib_uint, &na->shape);                                                  \
     }
 
 /**
@@ -176,5 +188,22 @@
  * @param na the array
  */
 #define eai_narray_deinit(type, array) eai_narray_deinit_##type(array)
+
+/**
+ * Return the length of an axis
+ * @param type the type of data stored in the elements of the array
+ * @param array the array
+ * @param axis the axis
+ * @return the length of the given axis
+ */
+#define eai_narray_count(type, array, axis) eai_narray_count_##type(array, axis)
+
+/**
+ * Return the number of axes
+ * @param type the type of the data
+ * @param array the array
+ * @return the axes count
+ */
+#define eai_narray_axes(type, array) eai_narray_axes_##type(array)
 
 #endif

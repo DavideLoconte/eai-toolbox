@@ -5,7 +5,7 @@
 #ifndef EAI_TOOLBOX_EAI_PROFILE_TEST_H
 #define EAI_TOOLBOX_EAI_PROFILE_TEST_H
 
-#include <stdbool.h>
+#include <ulib.h>
 
 bool eai_profile_test_wall_clock(void);
 bool eai_profile_test_sleep(void);

@@ -2,8 +2,9 @@
 // Created by DavideLoconte on 07-Nov-22.
 //
 
-#include <eai_profile.h>
 #include <ulib.h>
+
+#include <eai_profile.h>
 
 bool eai_profile_test_wall_clock(void)
 {

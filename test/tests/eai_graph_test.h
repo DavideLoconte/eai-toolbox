@@ -5,7 +5,7 @@
 #ifndef EAI_TOOLBOX_EAI_GRAPH_TEST_H
 #define EAI_TOOLBOX_EAI_GRAPH_TEST_H
 
-#include <utest.h>
+#include <ulib.h>
 
 bool eai_graph_test_1(void);
 bool eai_graph_test_2(void);
