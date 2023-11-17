@@ -26,7 +26,7 @@ if (NOT TARGET ulib)
     FetchContent_Declare(
             ulib
             GIT_REPOSITORY https://github.com/IvanoBilenchi/ulib.git
-            GIT_TAG 51883d97292e3db09518d8f75add89a2debfcbfb
+            GIT_TAG 63ce0a2c1448e4ee940a588c26bd0761ed92a4b6
     )
     FetchContent_MakeAvailable(ulib)
     set(ULIB_HEADERS_DIR ${ULIB_PUBLIC_HEADERS_DIR})
