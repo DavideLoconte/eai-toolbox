@@ -53,4 +53,4 @@ ulib_uint eai_int_log10(ulib_uint x)
 }
 
 ulib_uint eai_int_pow2(ulib_uint x) { return 1 << x; }
-ulib_uint eai_int_next_pow2(ulib_uint v) { return ulib_uint_next_power_2(v); }
+ulib_uint eai_int_next_pow2(ulib_uint v) { return ulib_uint_ceil2(v); }

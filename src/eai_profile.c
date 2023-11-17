@@ -79,7 +79,7 @@ ulib_uint eai_profile_get_resident_memory(void)
     }
 
     if(GetProcessMemoryInfo(h_process, &pmc, sizeof(pmc))) {
-        ulib_uint result = pmc.WorkingSetSize / 1024;
+        ulib_uint result = (ulib_uint) pmc.WorkingSetSize / 1024;
         CloseHandle(h_process);
         return result;
     }

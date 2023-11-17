@@ -56,7 +56,6 @@ PenaltyReturnTypeOnItsOwnLine: 99999
 PenaltyBreakOpenParenthesis: 9999
 PenaltyBreakBeforeFirstCallParameter: 9999
 PenaltyBreakAssignment: 9999
-PenaltyBreakBeforeFirstCallParameter: 9999
 
 AllowAllArgumentsOnNextLine: true
 # Taken from:
