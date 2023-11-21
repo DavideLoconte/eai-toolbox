@@ -88,13 +88,16 @@ ulib_uint eai_graph_del_edge_dev(EaiGraph_dev *g,
                                         EaiGraphNode_dev end);
 
 
-EaiGraphEdgeLoop_dev p_eai_graph_start_iterator_from_dev(EaiGraph_dev *g, EaiGraphNode_dev from);
-EaiGraphEdgeLoop_dev p_eai_graph_start_iterator_to_dev(EaiGraph_dev *g, EaiGraphNode_dev to);
 EaiGraphEdgeLoop_dev p_eai_graph_start_iterator_dev(EaiGraph_dev *g);
-
-void p_eai_graph_next_from_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l, EaiGraphNode_dev from);
-void p_eai_graph_next_to_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l, EaiGraphNode_dev to);
 void p_eai_graph_next_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l);
+
+void p_eai_graph_next_to_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l, EaiGraphNode_dev to);
+EaiGraphEdgeLoop_dev p_eai_graph_start_iterator_to_dev(EaiGraph_dev *g, EaiGraphNode_dev to);
+
+EaiGraphEdgeLoop_dev p_eai_graph_start_iterator_from_dev(EaiGraph_dev *g, EaiGraphNode_dev from);
+void p_eai_graph_next_from_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l, EaiGraphNode_dev from);
+
+
 
 
 /**

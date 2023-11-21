@@ -61,24 +61,6 @@ bool eai_graph_dev_test_3(void)
     eai_graph_add_edge_dev( &graph, 2, 2, 0);
     eai_graph_add_edge_dev( &graph, 4, 3, 0);
     eai_graph_add_edge_dev( &graph, 1, 0, 0);
-    printf("Baseline 0->1\n");
-    printf("Nodes: [");
-    uvec_foreach(EaiGraphNode_dev, &graph.nodes, n) {
-        printf("%u, ", *n.item);
-    }
-    printf("]\n");
-
-    printf("Edges: [");
-    uvec_foreach(EaiGraphEdge_dev, &graph.edges, e) {
-        printf("(%u, %u), ", e.item->to, e.item->val);
-    }
-    printf("\b\b]         \n");
-
-    printf("Limits: [");
-    uvec_foreach(ulib_uint, &graph.limits, l) {
-        printf("%u, ", *l.item);
-    }
-    printf("]\n");
 
     utest_assert_false(eai_graph_has_node_dev( &graph, 5));
     utest_assert_false(ubit_is_set(8, graph.flags, EAI_GRAPH_NOT_FOUND));
@@ -101,25 +83,6 @@ bool eai_graph_dev_test_3(void)
 
     utest_assert(eai_graph_del_edge_dev( &graph, 0, 1));
 
-    printf("Delete 0->1\n");
-    printf("Nodes: [");
-    uvec_foreach(EaiGraphNode_dev, &graph.nodes, n) {
-        printf("%u, ", *n.item);
-    }
-    printf("]\n");
-
-    printf("Edges: [");
-    uvec_foreach(EaiGraphEdge_dev, &graph.edges, e) {
-        printf("(%u, %u), ", e.item->to, e.item->val);
-    }
-    printf("\b\b]         \n");
-
-    printf("Limits: [");
-    uvec_foreach(ulib_uint, &graph.limits, l) {
-        printf("%u, ", *l.item);
-    }
-    printf("]\n");
-
     utest_assert_false(ubit_is_set(8, graph.flags, EAI_GRAPH_NOT_FOUND));
     utest_assert_false(eai_graph_has_edge_dev( &graph, 0, 1));
     eai_graph_get_edge_dev( &graph, 0, 1);
@@ -127,50 +90,12 @@ bool eai_graph_dev_test_3(void)
 
     eai_graph_add_edge_dev( &graph, 0, 1, 42);
 
-    printf("Add 0->1\n");
-    printf("Nodes: [");
-    uvec_foreach(EaiGraphNode_dev, &graph.nodes, n) {
-        printf("%u, ", *n.item);
-    }
-    printf("]\n");
-
-    printf("Edges: [");
-    uvec_foreach(EaiGraphEdge_dev, &graph.edges, e) {
-        printf("(%u, %u), ", e.item->to, e.item->val);
-    }
-    printf("\b\b]         \n");
-
-    printf("Limits: [");
-    uvec_foreach(ulib_uint, &graph.limits, l) {
-        printf("%u, ", *l.item);
-    }
-    printf("]\n");
-
     utest_assert(eai_graph_has_node_dev(&graph, 1));
     utest_assert(eai_graph_has_edge_dev(&graph, 1, 2));
     utest_assert(eai_graph_has_edge_dev(&graph, 1, 0));
     utest_assert(eai_graph_has_edge_dev(&graph, 0, 1));
 
     utest_assert(eai_graph_del_node_dev(&graph, 1));
-
-    printf("Delete 1\n");
-    printf("Nodes: [");
-    uvec_foreach(EaiGraphNode_dev, &graph.nodes, n) {
-        printf("%u, ", *n.item);
-    }
-    printf("]\n");
-
-    printf("Edges: [");
-    uvec_foreach(EaiGraphEdge_dev, &graph.edges, e) {
-        printf("(%u, %u), ", e.item->to, e.item->val);
-    }
-    printf("\b\b]         \n");
-
-    printf("Limits: [");
-    uvec_foreach(ulib_uint, &graph.limits, l) {
-        printf("%u, ", *l.item);
-    }
-    printf("]\n");
 
     utest_assert_false(eai_graph_has_node_dev(&graph, 1));
     utest_assert_false(eai_graph_has_edge_dev(&graph, 1, 2));
@@ -213,15 +138,16 @@ bool eai_graph_dev_test_4(void)
     utest_assert_uint(count, ==, 5);
 
     count = 0;
-    eai_graph_foreach_edge_to_dev( &graph, 2, edge) {
+    eai_graph_foreach_edge_to_dev(&graph, 2, edge) {
         count++;
     }
     utest_assert_uint(count, ==, 2);
 
     count = 0;
-    eai_graph_foreach_edge_from_dev( &graph, 1, edge) {
+    eai_graph_foreach_edge_from_dev(&graph, 1, edge) {
         count++;
     }
+
     utest_assert_uint(count, ==, 2);
 
     count = 0;

@@ -228,6 +228,8 @@ bool eai_graph_del_node_dev(EaiGraph_dev *g, EaiGraphNode_dev node)
         }
     }
 
+    uvec_remove_at(EaiGraphNode_dev, &g->nodes, idx);
+    uvec_remove_at(ulib_uint, &g->limits, idx);
     return true;
 }
 
@@ -303,18 +305,18 @@ EaiGraphEdgeLoop_dev p_eai_graph_start_iterator_dev(EaiGraph_dev *g)
 {
     EaiGraphEdgeLoop_dev loop;
     EaiGraphEdge_dev edge = uvec_first(EaiGraphEdge_dev, &g->edges);
+    loop.count = uvec_count(EaiGraphEdge_dev, &g->edges);
+    loop.i = 0;
 
-    uvec_foreach(ulib_uint, &g->limits, i) {
-        if (*i.item > 0) {
+    uvec_foreach_reverse(ulib_uint, &g->limits, i) {
+        if (0 < *i.item) {
             loop.start_i = i.i;
-            loop.start = uvec_get(EaiGraphNode_dev, &g->nodes, i.i);
         }
     }
 
+    loop.start = uvec_get(EaiGraphNode_dev, &g->nodes, loop.start_i);
     loop.end = uvec_get(EaiGraphNode_dev, &g->nodes, edge.to);
     loop.end_i = edge.to;
-    loop.count = uvec_count(EaiGraphEdge_dev, &g->edges);
-    loop.i = 0;
     return loop;
 }
 
@@ -340,14 +342,14 @@ void p_eai_graph_next_from_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l, EaiGrap
 {
     do {
         p_eai_graph_next_dev(g, l);
-    } while (l->i < l->count && l->end == from);
+    } while (l->i < l->count && l->start != from);
 }
 
 void p_eai_graph_next_to_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l, EaiGraphNode_dev to)
 {
     do {
         p_eai_graph_next_dev(g, l);
-    } while (l->i < l->count && l->end == to);
+    } while (l->i < l->count && l->end != to);
 }
 
 void p_eai_graph_next_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l)
@@ -358,13 +360,13 @@ void p_eai_graph_next_dev(EaiGraph_dev *g, EaiGraphEdgeLoop_dev *l)
     }
 
     EaiGraphEdge_dev edge = uvec_get(EaiGraphEdge_dev, &g->edges, l->i);
-    uvec_foreach(ulib_uint, &g->limits, i) {
-        if (*i.item > 0) {
+    uvec_foreach_reverse(ulib_uint, &g->limits, i) {
+        if (l->i < *i.item) {
             l->start_i = i.i;
-            l->start = uvec_get(EaiGraphNode_dev, &g->nodes, i.i);
         }
     }
 
+    l->start =  uvec_get(EaiGraphNode_dev, &g->nodes, l->start_i);
     l->end = uvec_get(EaiGraphNode_dev, &g->nodes, edge.to);
     l->end_i = edge.to;
 }
