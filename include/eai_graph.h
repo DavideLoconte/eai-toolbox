@@ -70,7 +70,7 @@
                                                                                                    \
     EaiGraph_##T eai_graph_##T(void);                                                              \
                                                                                                    \
-    bool eai_graph_are_equal_##T(EaiGraphNode_##T a, EaiGraphNode_##T b);                          \
+    bool eai_graph_nodes_are_equal_##T(EaiGraphNode_##T a, EaiGraphNode_##T b);                    \
     bool eai_graph_edge_eq_##T(EaiGraphEdgeEntry_##T a, EaiGraphEdgeEntry_##T b);                  \
     bool eai_edge_cmp_##T(EaiGraphEdgeEntry_##T a, EaiGraphEdgeEntry_##T b);                       \
                                                                                                    \
@@ -125,10 +125,10 @@
         return a.to < b.to;                                                                        \
     }                                                                                              \
                                                                                                    \
-    bool eai_graph_are_equal_##T(EaiGraphNode_##T a, EaiGraphNode_##T b) { return node_eq(a, b); } \
+    bool eai_graph_nodes_are_equal_##T(EaiGraphNode_##T a, EaiGraphNode_##T b) { return node_eq(a, b); } \
                                                                                                    \
     UVEC_IMPL_COMPARABLE(EaiGraphEdgeEntry_##T, eai_graph_edge_eq_##T, eai_edge_cmp_##T)           \
-    UVEC_IMPL_EQUATABLE(EaiGraphNode_##T, eai_graph_are_equal_##T)                                 \
+    UVEC_IMPL_EQUATABLE(EaiGraphNode_##T, eai_graph_nodes_are_equal_##T)                                 \
     UVEC_IMPL(EaiGraphEdgeList_##T)                                                                \
                                                                                                    \
     EaiGraph_##T eai_graph_##T(void)                                                               \
@@ -394,7 +394,7 @@
     EaiGraphEdgeLoop_##T p_eai_graph_start_iterator_to_##T(EaiGraph_##T *g, EaiGraphNode_##T end)  \
     {                                                                                              \
         EaiGraphEdgeLoop_##T r = p_eai_graph_start_iterator_##T(g);                                \
-        if(!eai_graph_are_equal_##T(r.end, end) && p_eai_graph_has_next_##T(g, &r)) {              \
+        if(!eai_graph_nodes_are_equal_##T(r.end, end) && p_eai_graph_has_next_##T(g, &r)) {              \
             p_eai_graph_next_to_##T(g, &r, end);                                                   \
         }                                                                                          \
         return r;                                                                                  \
@@ -404,7 +404,7 @@
                                                              EaiGraphNode_##T start)               \
     {                                                                                              \
         EaiGraphEdgeLoop_##T r = p_eai_graph_start_iterator_##T(g);                                \
-        if(!eai_graph_are_equal_##T(r.start, start) && p_eai_graph_has_next_##T(g, &r)) {          \
+        if(!eai_graph_nodes_are_equal_##T(r.start, start) && p_eai_graph_has_next_##T(g, &r)) {          \
             p_eai_graph_next_from_##T(g, &r, start);                                               \
         }                                                                                          \
         return r;                                                                                  \
@@ -416,14 +416,14 @@
     {                                                                                              \
         do {                                                                                       \
             p_eai_graph_next_##T(g, loop);                                                         \
-        } while(!eai_graph_are_equal_##T(loop->start, from) && p_eai_graph_has_next_##T(g, loop)); \
+        } while(!eai_graph_nodes_are_equal_##T(loop->start, from) && p_eai_graph_has_next_##T(g, loop)); \
     }                                                                                              \
                                                                                                    \
     void p_eai_graph_next_to_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *loop, EaiGraphNode_##T to) \
     {                                                                                              \
         do {                                                                                       \
             p_eai_graph_next_##T(g, loop);                                                         \
-        } while(!eai_graph_are_equal_##T(loop->end, to) && p_eai_graph_has_next_##T(g, loop));     \
+        } while(!eai_graph_nodes_are_equal_##T(loop->end, to) && p_eai_graph_has_next_##T(g, loop));     \
     }                                                                                              \
                                                                                                    \
     void p_eai_graph_next_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *loop)                         \
