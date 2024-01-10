@@ -51,7 +51,7 @@
     } EaiGraphEdgeEntry_##T;                                                                       \
                                                                                                    \
     UVEC_DECL_EQUATABLE(EaiGraphNode_##T)                                                          \
-    UVEC_DECL(EaiGraphEdgeEntry_##T)                                                               \
+    UVEC_DECL_COMPARABLE(EaiGraphEdgeEntry_##T)                                                    \
     typedef UVec(EaiGraphEdgeEntry_##T) EaiGraphEdgeList_##T;                                      \
     UVEC_DECL(EaiGraphEdgeList_##T)                                                                \
                                                                                                    \
