@@ -64,8 +64,13 @@
     typedef struct EaiGraphEdgeLoop_s_##T {                                                        \
         EaiGraphNode_##T start, end;                                                               \
         EaiGraphEdge_##T val;                                                                      \
-        ulib_uint __a;                                                                             \
-        ulib_uint __b;                                                                             \
+        ulib_uint _a;                                                                              \
+        ulib_uint _b;                                                                              \
+        ulib_uint _count_a;                                                                        \
+        ulib_uint _count_b;                                                                        \
+        EaiGraphEdgeList_##T *_data_b;                                                             \
+        EaiGraphEdgeEntry_##T *_data_a;                                                            \
+        EaiGraphNode_##T *_nodes_data;                                                             \
     } EaiGraphEdgeLoop_##T;                                                                        \
                                                                                                    \
     EaiGraph_##T eai_graph_##T(void);                                                              \
@@ -102,12 +107,12 @@
                                                              EaiGraphNode_##T from);               \
     EaiGraphEdgeLoop_##T p_eai_graph_start_iterator_to_##T(EaiGraph_##T *g,                        \
                                                            EaiGraphNode_##T from);                 \
-    void p_eai_graph_next_from_##T(EaiGraph_##T *g,                                                \
+    void p_eai_graph_next_from_##T(                                                \
                                    EaiGraphEdgeLoop_##T *l,                                        \
                                    EaiGraphNode_##T from);                                         \
-    void p_eai_graph_next_to_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *l, EaiGraphNode_##T to);   \
-    void p_eai_graph_next_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *l);                           \
-    bool p_eai_graph_has_next_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *l);
+    void p_eai_graph_next_to_##T(EaiGraphEdgeLoop_##T *l, EaiGraphNode_##T to);   \
+    void p_eai_graph_next_##T(EaiGraphEdgeLoop_##T *l);                           \
+    bool p_eai_graph_has_next_##T(EaiGraphEdgeLoop_##T *l);
 
 /**
  * @brief Implement a graph of type T
@@ -197,7 +202,7 @@
         uvec_ret ret = uvec_insert_sorted(EaiGraphEdgeEntry_##T,                                   \
                                           &uvec_data(EaiGraphEdgeList_##T, &g->edges)[idx],        \
                                           edge,                                                    \
-                                          NULL);                                                   \
+                                            NULL);                                                   \
         if(ret == UVEC_OK)                                                                         \
             return true;                                                                           \
         g->flags = ubit_set(8, EAI_GRAPH_MEM_ERROR, g->flags);                                     \
@@ -386,16 +391,21 @@
         r.start = uvec_first(EaiGraphNode_##T, &g->nodes);                                         \
         r.end = uvec_get(EaiGraphNode_##T, &g->nodes, first.to);                                   \
         r.val = first.val;                                                                         \
-        r.__a = 0;                                                                                 \
-        r.__b = 0;                                                                                 \
+        r._a = 0;                                                                                  \
+        r._b = 0;                                                                                  \
+        r._data_b = uvec_data(EaiGraphEdgeList_##T, &g->edges);                                    \
+        r._data_a = uvec_data(EaiGraphEdgeEntry_##T, &r._data_b[r._b]);                            \
+        r._count_a = uvec_count(EaiGraphEdgeEntry_##T, &r._data_b[r._b]);                          \
+        r._count_b = uvec_count(EaiGraphEdgeList_##T, &g->edges);                                  \
+        r._nodes_data = uvec_data(EaiGraphNode_##T, &g->nodes);                                    \
         return r;                                                                                  \
     }                                                                                              \
                                                                                                    \
     EaiGraphEdgeLoop_##T p_eai_graph_start_iterator_to_##T(EaiGraph_##T *g, EaiGraphNode_##T end)  \
     {                                                                                              \
         EaiGraphEdgeLoop_##T r = p_eai_graph_start_iterator_##T(g);                                \
-        if(!eai_graph_nodes_are_equal_##T(r.end, end) && p_eai_graph_has_next_##T(g, &r)) {              \
-            p_eai_graph_next_to_##T(g, &r, end);                                                   \
+        if(!eai_graph_nodes_are_equal_##T(r.end, end) && p_eai_graph_has_next_##T(&r)) {           \
+            p_eai_graph_next_to_##T(&r, end);                                                      \
         }                                                                                          \
         return r;                                                                                  \
     }                                                                                              \
@@ -404,67 +414,51 @@
                                                              EaiGraphNode_##T start)               \
     {                                                                                              \
         EaiGraphEdgeLoop_##T r = p_eai_graph_start_iterator_##T(g);                                \
-        if(!eai_graph_nodes_are_equal_##T(r.start, start) && p_eai_graph_has_next_##T(g, &r)) {          \
-            p_eai_graph_next_from_##T(g, &r, start);                                               \
+        if(!eai_graph_nodes_are_equal_##T(r.start, start) && p_eai_graph_has_next_##T(&r)) {       \
+            p_eai_graph_next_from_##T(&r, start);                                                  \
         }                                                                                          \
         return r;                                                                                  \
     }                                                                                              \
                                                                                                    \
-    void p_eai_graph_next_from_##T(EaiGraph_##T *g,                                                \
+    void p_eai_graph_next_from_##T(                                                                \
                                    EaiGraphEdgeLoop_##T *loop,                                     \
                                    EaiGraphNode_##T from)                                          \
     {                                                                                              \
         do {                                                                                       \
-            p_eai_graph_next_##T(g, loop);                                                         \
-        } while(!eai_graph_nodes_are_equal_##T(loop->start, from) && p_eai_graph_has_next_##T(g, loop)); \
+            p_eai_graph_next_##T(loop);                                                            \
+        } while(!eai_graph_nodes_are_equal_##T(loop->start, from) && p_eai_graph_has_next_##T(loop)); \
     }                                                                                              \
                                                                                                    \
-    void p_eai_graph_next_to_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *loop, EaiGraphNode_##T to) \
+    void p_eai_graph_next_to_##T(EaiGraphEdgeLoop_##T *loop, EaiGraphNode_##T to)                  \
     {                                                                                              \
         do {                                                                                       \
-            p_eai_graph_next_##T(g, loop);                                                         \
-        } while(!eai_graph_nodes_are_equal_##T(loop->end, to) && p_eai_graph_has_next_##T(g, loop));     \
+            p_eai_graph_next_##T(loop);                                                            \
+        } while(!eai_graph_nodes_are_equal_##T(loop->end, to) && p_eai_graph_has_next_##T(loop));  \
     }                                                                                              \
                                                                                                    \
-    void p_eai_graph_next_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *loop)                         \
+    void p_eai_graph_next_##T(EaiGraphEdgeLoop_##T *loop)                                          \
     {                                                                                              \
-        if(!uvec_index_is_valid(EaiGraphEdgeList_##T, &g->edges, loop->__b)) {                     \
-            return;                                                                                \
-        }                                                                                          \
-                                                                                                   \
         do {                                                                                       \
-            loop->__a += 1;                                                                        \
-            if(!uvec_index_is_valid(EaiGraphEdgeEntry_##T,                                         \
-                                    &uvec_get(EaiGraphEdgeList_##T, &g->edges, loop->__b),         \
-                                    loop->__a)) {                                                  \
-                loop->__b += 1;                                                                    \
-                loop->__a = 0;                                                                     \
+            loop->_a += 1;                                                                         \
+            if(loop->_a >= loop->_count_a) {                                                       \
+                loop->_b += 1;                                                                     \
+                loop->_a = 0;                                                                      \
+                if(loop->_b >= loop->_count_b) {                                                   \
+                    return;                                                                        \
+                }                                                                                  \
+                loop->_data_a = uvec_data(EaiGraphEdgeEntry_##T, &loop->_data_b[loop->_b]);        \
+                loop->_count_a = uvec_count(EaiGraphEdgeEntry_##T, &loop->_data_b[loop->_b]);      \
             }                                                                                      \
-            if(!uvec_index_is_valid(EaiGraphEdgeList_##T, &g->edges, loop->__b)) {                 \
-                return;                                                                            \
-            }                                                                                      \
-        } while(!uvec_index_is_valid(EaiGraphEdgeEntry_##T,                                        \
-                                     &uvec_get(EaiGraphEdgeList_##T, &g->edges, loop->__b),        \
-                                     loop->__a));                                                  \
+        } while(loop->_a >= loop->_count_a);                                                       \
                                                                                                    \
-        if(uvec_index_is_valid(EaiGraphEdgeList_##T, &g->edges, loop->__b)) {                      \
-            loop->start = uvec_get(EaiGraphNode_##T, &g->nodes, loop->__b);                        \
-            ulib_uint end_idx = uvec_get(EaiGraphEdgeEntry_##T,                                    \
-                                         &uvec_get(EaiGraphEdgeList_##T, &g->edges, loop->__b),    \
-                                         loop->__a)                                                \
-                                    .to;                                                           \
-                                                                                                   \
-            loop->end = uvec_get(EaiGraphNode_##T, &g->nodes, end_idx);                            \
-            loop->val = uvec_get(EaiGraphEdgeEntry_##T,                                            \
-                                 &uvec_get(EaiGraphEdgeList_##T, &g->edges, loop->__b),            \
-                                 loop->__a)                                                        \
-                            .val;                                                                  \
-        }                                                                                          \
+        loop->start = loop->_nodes_data[loop->_b];                                                 \
+        loop->end = loop->_nodes_data[loop->_data_a[loop->_a].to];                                 \
+        loop->val = loop->_data_a[loop->_a].val;                                                   \
     }                                                                                              \
                                                                                                    \
-    bool p_eai_graph_has_next_##T(EaiGraph_##T *g, EaiGraphEdgeLoop_##T *loop)                     \
+    bool p_eai_graph_has_next_##T(EaiGraphEdgeLoop_##T *loop)                                      \
     {                                                                                              \
-        return uvec_index_is_valid(EaiGraphEdgeList_##T, &g->edges, loop->__b);                    \
+        return loop->_b < loop->_count_b;                                                          \
     }
 
 /**
@@ -489,8 +483,8 @@
  */
 #define eai_graph_foreach_edge(T, graph, edge)                                                     \
     for(EaiGraphEdgeLoop_##T edge = p_eai_graph_start_iterator_##T((graph));                       \
-        p_eai_graph_has_next_##T((graph), &(edge));                                                \
-        p_eai_graph_next_##T((graph), &(edge)))
+        p_eai_graph_has_next_##T(&(edge));                                                \
+        p_eai_graph_next_##T(&(edge)))
 
 /**
  * Loop over all edges starting from the specified node
@@ -500,8 +494,8 @@
  */
 #define eai_graph_foreach_edge_from(T, graph, start, edge)                                         \
     for(EaiGraphEdgeLoop_##T edge = p_eai_graph_start_iterator_from_##T((graph), (start));         \
-        p_eai_graph_has_next_##T((graph), &(edge));                                                \
-        p_eai_graph_next_from_##T((graph), &(edge), start))
+        p_eai_graph_has_next_##T(&(edge));                                                \
+        p_eai_graph_next_from_##T(&(edge), start))
 
 /**
  * Loop over all edges ending into the specified node
@@ -511,8 +505,8 @@
  */
 #define eai_graph_foreach_edge_to(T, graph, end, edge)                                             \
     for(EaiGraphEdgeLoop_##T edge = p_eai_graph_start_iterator_to_##T((graph), (end));             \
-        p_eai_graph_has_next_##T((graph), &(edge));                                                \
-        p_eai_graph_next_to_##T((graph), &(edge), end))
+        p_eai_graph_has_next_##T(&(edge));                                                \
+        p_eai_graph_next_to_##T(&(edge), end))
 
 /**
  * @brief create a graph of type T
@@ -690,7 +684,7 @@
  * @param graph the graph
  * @param loop the loop structure
  */
-#define p_eai_graph_next(T, graph, loop) p_eai_graph_next_##T(graph, loop)
+#define p_eai_graph_next(T, loop) p_eai_graph_next_##T(loop)
 
 /**
  * @warning PRIVATE function, dont use this
@@ -699,6 +693,6 @@
  * @param loop the loop structure
  * @param true if the next edge exists
  */
-#define p_eai_graph_has_next(T, graph, loop) p_eai_graph_has_next_##T(graph, loop)
+#define p_eai_graph_has_next(T, loop) p_eai_graph_has_next_##T(loop)
 
 #endif // EAI_TOOLBOX_EAI_GRAPH_H
