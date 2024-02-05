@@ -49,7 +49,7 @@ void eai_cluster_deinit(EaiClusterResults *results)
 
 // Private impl ===============================================================
 
-UVEC_IMPL(UVec(ulib_float));
+UVEC_IMPL(UVec(ulib_float))
 
 void reinit_centroids(EaiClusterResults *results)
 {

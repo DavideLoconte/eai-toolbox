@@ -24,8 +24,18 @@ bool eai_narray_get_test(void)
     utest_assert_float(eai_narray_get(ulib_float, &array, 0, 1, 2), ==, 0.0);
     utest_assert_uint(eai_narray_get(ulib_uint, &array2, 1, 2, 3, 4, 3, 2, 1, 2, 3, 4), ==, 0.0);
 
+    ulib_uint count = 0;
+    UVec(ulib_uint) *shape = eai_narray_shape(ulib_float, &array);
+
+    uvec_foreach(ulib_uint, shape, iter) {
+        count++;
+        utest_assert_uint(*iter.item, ==, 3);
+    }
+    utest_assert_uint(count, ==, 3);
+
     eai_narray_deinit(ulib_float, &array);
     eai_narray_deinit(ulib_uint, &array2);
+
     return true;
 }
 
@@ -54,15 +64,27 @@ bool eai_narray_shape_test(void)
 
 bool eai_narray_set_test(void)
 {
-    EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
+    UVec(ulib_uint) shape = uvec(ulib_uint);
+    uvec_push(ulib_uint, &shape, 3);
+    uvec_push(ulib_uint, &shape, 3);
+    uvec_push(ulib_uint, &shape, 3);
+
+    EaiNArray(ulib_float) array = eai_narray_from_shape(ulib_float, &shape);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+
+    uvec_deinit(ulib_uint, &shape);
 
     for(ulib_uint i = 0; i < 1000; i++) {
         ulib_uint idx_1[3] = { rand() % 3, rand() % 3, rand() % 3 };
         ulib_uint idx_2[10] = { rand() % 5, rand() % 5, rand() % 5, rand() % 5, rand() % 5,
                                 rand() % 5, rand() % 5, rand() % 5, rand() % 5, rand() % 5 };
 
-        ulib_float old_value_1 = eai_narray_get(ulib_float, &array, idx_1[0], idx_1[1], idx_1[2]);
+        UVec(ulib_uint) coordinates = uvec(ulib_uint);
+        uvec_push(ulib_uint, &coordinates, idx_1[0]);
+        uvec_push(ulib_uint, &coordinates, idx_1[1]);
+        uvec_push(ulib_uint, &coordinates, idx_1[2]);
+
+        ulib_float old_value_1 = eai_narray_get_from_coordinates(ulib_float, &array, &coordinates);
         ulib_uint old_value_2 = eai_narray_get(ulib_uint,
                                                &array2,
                                                idx_2[0],
@@ -79,12 +101,7 @@ bool eai_narray_set_test(void)
         ulib_uint new_value_2 = rand();
         ulib_float new_value_1 = (ulib_float) new_value_2 / 100.0;
 
-        ulib_float replaced_value_1 = eai_narray_set(ulib_float,
-                                                     &array,
-                                                     new_value_1,
-                                                     idx_1[0],
-                                                     idx_1[1],
-                                                     idx_1[2]);
+        ulib_float replaced_value_1 = eai_narray_set_from_coordinates(ulib_float, &array, new_value_1, &coordinates);
 
         ulib_uint replaced_value_2 = eai_narray_set(ulib_uint,
                                                     &array2,
@@ -103,11 +120,7 @@ bool eai_narray_set_test(void)
         utest_assert_float(replaced_value_1, ==, old_value_1);
         utest_assert_uint(replaced_value_2, ==, old_value_2);
 
-        ulib_float retrieved_value_1 = eai_narray_get(ulib_float,
-                                                      &array,
-                                                      idx_1[0],
-                                                      idx_1[1],
-                                                      idx_1[2]);
+        ulib_float retrieved_value_1 = eai_narray_get_from_coordinates(ulib_float, &array, &coordinates);
         ulib_uint retrieved_value_2 = eai_narray_get(ulib_uint,
                                                      &array2,
                                                      idx_2[0],
@@ -126,6 +139,8 @@ bool eai_narray_set_test(void)
 
         old_value_1 = retrieved_value_1;
         old_value_2 = retrieved_value_2;
+
+        uvec_deinit(ulib_uint, &coordinates);
     }
 
     eai_narray_deinit(ulib_float, &array);

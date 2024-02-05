@@ -27,10 +27,10 @@
 
 #include <ulib.h>
 
-UVEC_DECL(UVec(ulib_float))
+#include "eai_narray_builtin.h"
 
 typedef struct EaiClusterResults_s {
-    UVec(UVec(ulib_float)) centroids;
+    EaiNArray(ulib_float) centroids;
     UVec(ulib_uint) cluster;
     UVec(ulib_uint) cluster_size;
 } EaiClusterResults;
@@ -43,7 +43,7 @@ typedef struct EaiKMeansConfig_s {
 
 typedef struct EaiKMedoidsConfig_s {
     ulib_uint max_iter;
-    ulib_uint n_clusters; 
+    ulib_uint n_clusters;
     ulib_uint seed;
 } EaiKMedoidsConfig;
 
@@ -53,12 +53,12 @@ typedef struct EaiKMedoidsConfig_s {
 EaiKMeansConfig eai_cluster_kmeans_config(void);
 
 /**
- * Execute kmeans on the supplied data matrix 
+ * Execute kmeans on the supplied data matrix
  * @param config algorithm configuration
  * @param data dataset to cluster
  * @return the results of the clustering
  */
-EaiClusterResults eai_cluster_kmeans(EaiKMeansConfig *config, UVec(UVec(ulib_float)) *data);
+EaiClusterResults eai_cluster_kmeans(EaiKMeansConfig *config, EaiNArray(ulib_float) *data);
 
 
 /**
@@ -67,12 +67,12 @@ EaiClusterResults eai_cluster_kmeans(EaiKMeansConfig *config, UVec(UVec(ulib_flo
 EaiKMedoidsConfig eai_cluster_kmedoids_config(void);
 
 /**
- * Execute kmedoids on the supplied data matrix 
+ * Execute kmedoids on the supplied data matrix
  * @param config algorithm configuration
  * @param data dataset to cluster
  * @return the results of the clustering
- */ 
-EaiClusterResults eai_cluster_kmedoids(EaiKMedoidsConfig *config, UVec(UVec(ulib_float)) *data);
+ */
+EaiClusterResults eai_cluster_kmedoids(EaiKMedoidsConfig *config, EaiNArray(ulib_float) *data);
 
 /**
  * Free up memory allocated for EaiClusterResults structure

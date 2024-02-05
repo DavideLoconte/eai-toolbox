@@ -1,6 +1,6 @@
 #include "eai_cluster.h"
 #include "eai_cluster_private.h"
-#include "ubase.h"
+#include "eai_narray_builtin.h"
 
 /**
  * The clustering context, data specific to kmedoids clustering algorithm
@@ -24,8 +24,8 @@
  */
 typedef struct EaiClusterContext_s {
     EaiClusterResults results;
-    UVec(UVec(ulib_float)) * data;
-    UVec(UVec(ulib_float)) distances;
+    EaiNArray(ulib_float) *data;
+    EaiNArray(ulib_float) distances;
     UVec(ulib_uint) medoids;
 } EaiClusterContext;
 
@@ -50,7 +50,7 @@ static ulib_float compute_cost(EaiClusterContext *context);
  */
 
 static EaiClusterContext eai_cluster_context(EaiKMedoidsConfig *config,
-                                             UVec(UVec(ulib_float)) * data);
+                                             EaiNArray(ulib_float)* data);
 
 /**
  * @param context the clustering context
@@ -99,7 +99,7 @@ EaiKMedoidsConfig eai_cluster_kmedoids_config(void)
     return result;
 }
 
-EaiClusterResults eai_cluster_kmedoids(EaiKMedoidsConfig *config, UVec(UVec(ulib_float)) * data)
+EaiClusterResults eai_cluster_kmedoids(EaiKMedoidsConfig *config, EaiNArray(ulib_float)* data)
 {
     EaiClusterContext context = eai_cluster_context(config, data);
     ulib_byte stop = 0;
@@ -115,7 +115,7 @@ EaiClusterResults eai_cluster_kmedoids(EaiKMedoidsConfig *config, UVec(UVec(ulib
 
 // Private impl ================================================================
 
-EaiClusterContext eai_cluster_context(EaiKMedoidsConfig *config, UVec(UVec(ulib_float) * data))
+EaiClusterContext eai_cluster_context(EaiKMedoidsConfig *config, EaiNArray(ulib_float)* data))
 {
     EaiClusterContext context;
     eai_init_clustering(&context.results, data);

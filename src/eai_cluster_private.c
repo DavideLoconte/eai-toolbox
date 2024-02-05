@@ -2,14 +2,14 @@
 #include "ustrbuf.h"
 #include "uvec_builtin.h"
 
-
-void eai_init_clustering(EaiClusterResults *results, UVec(UVec(ulib_float)) * data)
+void eai_init_clustering(EaiClusterResults *results, EaiNArray(ulib_float) *data, ulib_uint n_cluster)
 {
-    const ulib_uint data_count = uvec_count(UVec(ulib_float), data);
+    const ulib_uint data_count = eai_cluster_get_data_count(data);
+    const ulib_uint data_shape = eai_cluster_get_data_shape(data);
 
     results->cluster_size = uvec(ulib_uint);
     results->cluster = uvec(ulib_uint);
-    results->centroids = uvec(UVec(ulib_float));
+    results->centroids = eai_narray(ulib_float, 2, n_cluster, data_shape);
 
     for(ulib_uint i = 0; i < data_count; i++) {
         uvec_push(ulib_uint, &results->cluster, 0);
@@ -17,10 +17,12 @@ void eai_init_clustering(EaiClusterResults *results, UVec(UVec(ulib_float)) * da
 }
 
 void eai_select_random_centroids(EaiClusterResults *results,
-                                 UVec(UVec(ulib_float)) * data,
+                                 EaiNArray(ulib_float) *data,
                                  ulib_uint n_cluster)
 {
-    const ulib_uint data_count = uvec_count(UVec(ulib_float), data);
+    const ulib_uint data_count = eai_cluster_get_data_count(data);
+    const ulib_uint data_shape = eai_cluster_get_data_shape(data);
+
     UVec(ulib_uint) clusters = uvec(ulib_uint);
 
     while(uvec_count(ulib_uint, &clusters) < n_cluster) {
@@ -29,7 +31,7 @@ void eai_select_random_centroids(EaiClusterResults *results,
 
     uvec_foreach(ulib_uint, &clusters, x) {
         UVec(ulib_float) centroid = uvec(ulib_float);
-        UVec(ulib_float) *data_point = &uvec_get(UVec(ulib_float), data, *x.item);
+//        UVec(ulib_float) *data_point = &uvec_get(UVec(ulib_float), data, *x.item);
 
         uvec_copy(ulib_float, data_point, &centroid);
         uvec_push(UVec(ulib_float), &results->centroids, centroid);
@@ -82,3 +84,12 @@ void eai_assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) * da
     }
 }
 
+ulib_uint eai_cluster_get_data_count(EaiNArray(ulib_float) *data)
+{
+    return uvec_first(ulib_uint, eai_narray_shape(ulib_float, data));
+}
+
+ulib_uint eai_cluster_get_data_shape(EaiNArray(ulib_float) *data)
+{
+    return uvec_last(ulib_uint, eai_narray_shape(ulib_float, data));
+}
