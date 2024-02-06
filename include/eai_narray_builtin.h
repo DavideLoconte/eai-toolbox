@@ -29,8 +29,8 @@
 #include "eai_narray.h"
 
 EAI_NARRAY_DECL(ulib_uint)
-EAI_NARRAY_DECL(ulib_float)
 EAI_NARRAY_DECL(ulib_int)
 EAI_NARRAY_DECL(ulib_byte)
+EAI_NARRAY_DECL(ulib_float)
 
 #endif

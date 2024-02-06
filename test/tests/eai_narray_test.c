@@ -5,6 +5,13 @@ bool eai_narray_base_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+
+    utest_assert_uint(eai_narray_size(ulib_float, &array), ==, (3*3*3));
+    utest_assert_uint(eai_narray_size(ulib_uint, &array2), ==, (5*5*5*5*5*5*5*5*5*5));
+
+    utest_assert_uint(eai_narray_axes(ulib_float, &array), ==, 3);
+    utest_assert_uint(eai_narray_axes(ulib_uint, &array2), ==, 10);
+
     eai_narray_deinit(ulib_float, &array);
     eai_narray_deinit(ulib_uint, &array2);
     return true;
@@ -153,6 +160,7 @@ bool eai_narray_get_ref_test(void)
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
 
+
     ulib_float *start_1 = eai_narray_get_ref(ulib_float, &array, 0, 0, 0);
     ulib_uint *start_2 = eai_narray_get_ref(ulib_uint, &array2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -197,3 +205,49 @@ bool eai_narray_get_ref_test(void)
     return true;
 }
 
+void print_eai_narray(EaiNArray(ulib_float) *arr)
+{
+    printf("Array with %u dims\n", uvec_count(ulib_uint, &arr->shape));
+    printf("Shape: [");
+    uvec_foreach(ulib_uint, &arr->shape, dim) {
+        printf(" %u", *dim.item);
+    }
+    printf(" ]\n");
+
+    printf("Items: [ ");
+    for(ulib_uint i = 0; i < eai_narray_size(ulib_float, arr); i++) {
+        printf(" %.2lf", arr->storage[i]);
+    }
+    printf(" ]\n");
+}
+
+bool eai_narray_iter_test(void)
+{
+    EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 2, 3, 4);
+
+    ulib_uint count = 0;
+    for(ulib_uint i = 0;i < 2; i++) {
+        for (ulib_uint j = 0; j < 3; j++) {
+            for (ulib_uint k = 0; k < 4; k++) {
+                eai_narray_set(ulib_float, &array, count++, i, j, k);
+            }
+        }
+    }
+
+    print_eai_narray(&array);
+    eai_narray_foreach(ulib_float, &array, iter) {
+        print_eai_narray(&iter.item);
+        eai_narray_foreach(ulib_float, &iter.item, iter2) {
+            print_eai_narray(&iter2.item);
+            eai_narray_foreach(ulib_float, &iter2.item, iter3) {
+                print_eai_narray(&iter3.item);
+                eai_narray_foreach(ulib_float, &iter3.item, iter4) {
+                    print_eai_narray(&iter4.item);
+                }
+            }
+        }
+    }
+
+    eai_narray_deinit(ulib_float, &array);
+    return true;
+}
