@@ -2,86 +2,22 @@
 #include "ustrbuf.h"
 #include "uvec_builtin.h"
 
-void eai_init_clustering(EaiClusterResults *results, EaiNArray(ulib_float) *data, ulib_uint n_cluster)
+ulib_float eai_distance(EaiNArray(ulib_float)* a, EaiNArray(ulib_float)* b, ulib_uint shape)
 {
-    const ulib_uint data_count = eai_cluster_get_data_count(data);
-    const ulib_uint data_shape = eai_cluster_get_data_shape(data);
-
-    results->cluster_size = uvec(ulib_uint);
-    results->cluster = uvec(ulib_uint);
-    results->centroids = eai_narray(ulib_float, 2, n_cluster, data_shape);
-
-    for(ulib_uint i = 0; i < data_count; i++) {
-        uvec_push(ulib_uint, &results->cluster, 0);
-    }
+    return sqrt(eai_squared_distance(a, b, shape));
 }
 
-void eai_select_random_centroids(EaiClusterResults *results,
-                                 EaiNArray(ulib_float) *data,
-                                 ulib_uint n_cluster)
-{
-    const ulib_uint data_count = eai_cluster_get_data_count(data);
-    const ulib_uint data_shape = eai_cluster_get_data_shape(data);
-
-    UVec(ulib_uint) clusters = uvec(ulib_uint);
-
-    while(uvec_count(ulib_uint, &clusters) < n_cluster) {
-        uvec_insert_sorted_unique(ulib_uint, &clusters, rand() % data_count, NULL);
-    }
-
-    uvec_foreach(ulib_uint, &clusters, x) {
-        UVec(ulib_float) centroid = uvec(ulib_float);
-//        UVec(ulib_float) *data_point = &uvec_get(UVec(ulib_float), data, *x.item);
-
-        uvec_copy(ulib_float, data_point, &centroid);
-        uvec_push(UVec(ulib_float), &results->centroids, centroid);
-        uvec_push(ulib_uint, &results->cluster_size, 0);
-    }
-
-    uvec_deinit(ulib_uint, &clusters);
-}
-
-ulib_float eai_distance(UVec(ulib_float) * a, UVec(ulib_float) * b)
-{
-    return sqrt(eai_squared_distance(a, b));
-}
-
-ulib_float eai_squared_distance(UVec(ulib_float) * a, UVec(ulib_float) * b)
+ulib_float eai_squared_distance(EaiNArray(ulib_float)* a, EaiNArray(ulib_float)* b, ulib_uint shape)
 {
     ulib_float dist = 0;
-    uvec_foreach(ulib_float, a, _x1) {
-        ulib_float x1 = *_x1.item;
-        ulib_float x2 = uvec_get(ulib_float, b, _x1.i);
+
+    for (ulib_uint i = 0; i < shape; i++) {
+        ulib_float x1 = a->storage[i];
+        ulib_float x2 = b->storage[i];
         dist += (x1 - x2) * (x1 - x2);
     }
+
     return dist;
-}
-
-void eai_assign_clusters(EaiClusterResults *results, UVec(UVec(ulib_float)) * data)
-{
-    ulib_uint n_clusters = uvec_count(UVec(ulib_float), &results->centroids);
-    uvec_foreach(ulib_uint, &results->cluster_size, value) {
-        *value.item = 0;
-    }
-
-    uvec_foreach(UVec(ulib_float), data, sample) {
-        ulib_uint min_cluster = 42;
-        ulib_float min_distance = ULIB_FLOAT_MAX;
-
-        for(ulib_uint i = 0; i < n_clusters; i++) {
-            UVec(ulib_float) *centroid = &uvec_get(UVec(ulib_float), &results->centroids, i);
-            ulib_float d = eai_distance(sample.item, centroid);
-
-            if(d <= min_distance) {
-                min_distance = d;
-                min_cluster = i;
-            }
-        }
-
-        ulib_uint previous_cluster_size = uvec_get(ulib_uint, &results->cluster_size, min_cluster);
-        uvec_set(ulib_uint, &results->cluster, sample.i, min_cluster);
-        uvec_set(ulib_uint, &results->cluster_size, min_cluster, (previous_cluster_size + 1));
-    }
 }
 
 ulib_uint eai_cluster_get_data_count(EaiNArray(ulib_float) *data)

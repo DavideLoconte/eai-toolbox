@@ -22,14 +22,14 @@ bool eai_narray_get_test(void)
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
 
-    utest_assert_float(eai_narray_get(ulib_float, &array, 2, 2, 2), ==, 0.0);
-    utest_assert_uint(eai_narray_get(ulib_uint, &array2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4), ==, 0.0);
+    utest_assert_float(eai_narray_value_at(ulib_float, &array, 2, 2, 2), ==, 0.0);
+    utest_assert_uint(eai_narray_value_at(ulib_uint, &array2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4), ==, 0.0);
 
-    utest_assert_float(eai_narray_get(ulib_float, &array, 0, 0, 0), ==, 0.0);
-    utest_assert_uint(eai_narray_get(ulib_uint, &array2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), ==, 0.0);
+    utest_assert_float(eai_narray_value_at(ulib_float, &array, 0, 0, 0), ==, 0.0);
+    utest_assert_uint(eai_narray_value_at(ulib_uint, &array2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), ==, 0.0);
 
-    utest_assert_float(eai_narray_get(ulib_float, &array, 0, 1, 2), ==, 0.0);
-    utest_assert_uint(eai_narray_get(ulib_uint, &array2, 1, 2, 3, 4, 3, 2, 1, 2, 3, 4), ==, 0.0);
+    utest_assert_float(eai_narray_value_at(ulib_float, &array, 0, 1, 2), ==, 0.0);
+    utest_assert_uint(eai_narray_value_at(ulib_uint, &array2, 1, 2, 3, 4, 3, 2, 1, 2, 3, 4), ==, 0.0);
 
     ulib_uint count = 0;
     UVec(ulib_uint) *shape = eai_narray_shape(ulib_float, &array);
@@ -91,8 +91,8 @@ bool eai_narray_set_test(void)
         uvec_push(ulib_uint, &coordinates, idx_1[1]);
         uvec_push(ulib_uint, &coordinates, idx_1[2]);
 
-        ulib_float old_value_1 = eai_narray_get_from_coordinates(ulib_float, &array, &coordinates);
-        ulib_uint old_value_2 = eai_narray_get(ulib_uint,
+        ulib_float old_value_1 = eai_narray_value_at_from_coordinates(ulib_float, &array, &coordinates);
+        ulib_uint old_value_2 = eai_narray_value_at(ulib_uint,
                                                &array2,
                                                idx_2[0],
                                                idx_2[1],
@@ -108,9 +108,9 @@ bool eai_narray_set_test(void)
         ulib_uint new_value_2 = rand();
         ulib_float new_value_1 = (ulib_float) new_value_2 / 100.0;
 
-        ulib_float replaced_value_1 = eai_narray_set_from_coordinates(ulib_float, &array, new_value_1, &coordinates);
+        ulib_float replaced_value_1 = eai_narray_set_value_at_from_coordinates(ulib_float, &array, new_value_1, &coordinates);
 
-        ulib_uint replaced_value_2 = eai_narray_set(ulib_uint,
+        ulib_uint replaced_value_2 = eai_narray_set_value_at(ulib_uint,
                                                     &array2,
                                                     new_value_2,
                                                     idx_2[0],
@@ -127,8 +127,8 @@ bool eai_narray_set_test(void)
         utest_assert_float(replaced_value_1, ==, old_value_1);
         utest_assert_uint(replaced_value_2, ==, old_value_2);
 
-        ulib_float retrieved_value_1 = eai_narray_get_from_coordinates(ulib_float, &array, &coordinates);
-        ulib_uint retrieved_value_2 = eai_narray_get(ulib_uint,
+        ulib_float retrieved_value_1 = eai_narray_value_at_from_coordinates(ulib_float, &array, &coordinates);
+        ulib_uint retrieved_value_2 = eai_narray_value_at(ulib_uint,
                                                      &array2,
                                                      idx_2[0],
                                                      idx_2[1],
@@ -161,25 +161,25 @@ bool eai_narray_get_ref_test(void)
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
 
 
-    ulib_float *start_1 = eai_narray_get_ref(ulib_float, &array, 0, 0, 0);
-    ulib_uint *start_2 = eai_narray_get_ref(ulib_uint, &array2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    ulib_float *start_1 = eai_narray_value_at_ref(ulib_float, &array, 0, 0, 0);
+    ulib_uint *start_2 = eai_narray_value_at_ref(ulib_uint, &array2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     utest_assert_float(*start_1, ==, 0.0);
     utest_assert_float(*start_2, ==, 0.0);
 
-    ulib_float *end_1 = eai_narray_get_ref(ulib_float, &array, 2, 2, 2);
-    ulib_uint *end_2 = eai_narray_get_ref(ulib_uint, &array2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+    ulib_float *end_1 = eai_narray_value_at_ref(ulib_float, &array, 2, 2, 2);
+    ulib_uint *end_2 = eai_narray_value_at_ref(ulib_uint, &array2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4);
 
     utest_assert_float(*end_1, ==, 0.0);
     utest_assert_float(*end_2, ==, 0.0);
 
     for(ulib_uint i = 0; i < 100; i++) {
-        ulib_float *x_1 = eai_narray_get_ref(ulib_float,
+        ulib_float *x_1 = eai_narray_value_at_ref(ulib_float,
                                              &array,
                                              rand() % 3,
                                              rand() % 3,
                                              rand() % 3);
-        ulib_uint *x_2 = eai_narray_get_ref(ulib_uint,
+        ulib_uint *x_2 = eai_narray_value_at_ref(ulib_uint,
                                             &array2,
                                             rand() % 5,
                                             rand() % 5,
@@ -205,22 +205,6 @@ bool eai_narray_get_ref_test(void)
     return true;
 }
 
-void print_eai_narray(EaiNArray(ulib_float) *arr)
-{
-    printf("Array with %u dims\n", uvec_count(ulib_uint, &arr->shape));
-    printf("Shape: [");
-    uvec_foreach(ulib_uint, &arr->shape, dim) {
-        printf(" %u", *dim.item);
-    }
-    printf(" ]\n");
-
-    printf("Items: [ ");
-    for(ulib_uint i = 0; i < eai_narray_size(ulib_float, arr); i++) {
-        printf(" %.2lf", arr->storage[i]);
-    }
-    printf(" ]\n");
-}
-
 bool eai_narray_iter_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 2, 3, 4);
@@ -229,20 +213,16 @@ bool eai_narray_iter_test(void)
     for(ulib_uint i = 0;i < 2; i++) {
         for (ulib_uint j = 0; j < 3; j++) {
             for (ulib_uint k = 0; k < 4; k++) {
-                eai_narray_set(ulib_float, &array, count++, i, j, k);
+                eai_narray_set_value_at(ulib_float, &array, count++, i, j, k);
             }
         }
     }
 
-    print_eai_narray(&array);
     eai_narray_foreach(ulib_float, &array, iter) {
-        print_eai_narray(&iter.item);
         eai_narray_foreach(ulib_float, &iter.item, iter2) {
-            print_eai_narray(&iter2.item);
             eai_narray_foreach(ulib_float, &iter2.item, iter3) {
-                print_eai_narray(&iter3.item);
                 eai_narray_foreach(ulib_float, &iter3.item, iter4) {
-                    print_eai_narray(&iter4.item);
+                    volatile ulib_float val = iter4.item.storage[0];
                 }
             }
         }

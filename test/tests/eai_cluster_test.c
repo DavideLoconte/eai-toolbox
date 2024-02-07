@@ -6,43 +6,44 @@
 /**
  * @return test data for clustering
  */
-static UVec(UVec(ulib_float)) setup_data_1(void);
+static EaiNArray(ulib_float) setup_data_1(void);
 
 /**
  * @return test data for clustering
  */
-static UVec(UVec(ulib_float)) setup_data_2(void);
+static EaiNArray(ulib_float) setup_data_2(void);
 
 /**
  * @return test data for clustering
  */
-static UVec(UVec(ulib_float)) setup_data_3(void);
+static EaiNArray(ulib_float) setup_data_3(void);
 
 /**
  * @param test data to deinit to free up resources
  */
-static void teardown_data(UVec(UVec(ulib_float)) * data);
+static void teardown_data(EaiNArray(ulib_float) *data);
 
 // Public impl =================================================================
 
 bool test_eai_cluster_kmeans1(void)
 {
-    UVec(UVec(ulib_float)) data = setup_data_1();
+    EaiNArray(ulib_float) data = setup_data_1();
     const ulib_float expected_centroids[3][2] = { { 1, 1 }, { 7, 1 }, { 4, 7 } };
     ulib_byte found[3] = { 0, 0, 0 };
 
-    EaiKMeansConfig config = eai_cluster_kmeans_config();
-    config.n_clusters = 3;
+    EaiModel model = eai_cluster_kmeans(3, 100, 10);
+    eai_model_fit(&model, &data);
 
-    EaiClusterResults cluster_results = eai_cluster_kmeans(&config, &data);
-    utest_assert_uint(uvec_count(UVec(ulib_float), &cluster_results.centroids), ==, 3);
-    utest_assert_uint(uvec_count(ulib_uint, &cluster_results.cluster), ==, 12);
-    utest_assert_uint(uvec_count(ulib_uint, &cluster_results.cluster_size), ==, 3);
+    UVec(ulib_uint) *clusters = eai_cluster_kmeans_clusters(&model);
+    EaiNArray(ulib_float) *centroids = eai_cluster_kmeans_centroids(&model);
+    UVec(ulib_uint) *centroids_shape = eai_narray_shape(ulib_float, centroids);
 
-    uvec_foreach(UVec(ulib_float), &cluster_results.centroids, centroid) {
-        utest_assert_uint(uvec_count(ulib_float, centroid.item), ==, 2);
-        ulib_float x1 = uvec_get(ulib_float, centroid.item, 0);
-        ulib_float x2 = uvec_get(ulib_float, centroid.item, 1);
+    utest_assert_uint(uvec_first(ulib_uint, centroids_shape), ==, 3);
+    utest_assert_uint(uvec_count(ulib_uint, clusters), ==, 12);
+
+    eai_narray_foreach(ulib_float, centroids, centroid) {
+        ulib_float x1 = eai_narray_value_at(ulib_float, &centroid.item, 0);
+        ulib_float x2 = eai_narray_value_at(ulib_float, &centroid.item, 1);
 
         for(ulib_uint i = 0; i < 3; i++) {
             if(x1 == expected_centroids[i][0] && x2 == expected_centroids[i][1]) {
@@ -55,46 +56,51 @@ bool test_eai_cluster_kmeans1(void)
     utest_assert_uint(found[1], ==, 1);
     utest_assert_uint(found[2], ==, 1);
     teardown_data(&data);
-    eai_cluster_deinit(&cluster_results);
+    eai_model_deinit(&model);
     return true;
 }
 
 bool test_eai_cluster_kmeans2(void)
 {
-    UVec(UVec(ulib_float)) data = setup_data_2();
+    EaiNArray(ulib_float) data = setup_data_2();
     const ulib_uint expected_clusters[30] = { 1, 0, 2, 2, 1, 0, 0, 2, 0, 2, 2, 2, 1, 2, 0,
                                               0, 1, 0, 0, 1, 0, 0, 1, 2, 1, 2, 2, 1, 1, 1 };
 
     ulib_uint mapping[3] = { -1, -1, -1 };
 
+    EaiModel model = eai_cluster_kmeans(3, 100, 10);
+    eai_model_fit(&model, &data);
+
+    UVec(ulib_uint) *clusters = eai_cluster_kmeans_clusters(&model);
+    EaiNArray(ulib_float) *centroids = eai_cluster_kmeans_centroids(&model);
+    UVec(ulib_uint) *centroids_shape = eai_narray_shape(ulib_float, centroids);
+
+    utest_assert_uint(uvec_first(ulib_uint, centroids_shape), ==, 3);
+    utest_assert_uint(uvec_count(ulib_uint, clusters), ==, 30);
+
     ulib_uint errors = 0;
-    EaiKMeansConfig config = eai_cluster_kmeans_config();
-    config.n_clusters = 3;
-    config.max_iter = 1000;
-    config.seed = 1;
 
-    EaiClusterResults cluster_results = eai_cluster_kmeans(&config, &data);
-
-    uvec_foreach(ulib_uint, &cluster_results.cluster, _cluster) {
-        ulib_uint cluster = mapping[*_cluster.item];
-        if(cluster == (ulib_uint) -1) {
-            cluster = mapping[*_cluster.item] = expected_clusters[_cluster.i];
+    uvec_foreach(ulib_uint, clusters, cluster) {
+        ulib_uint mapped_cluster = mapping[*cluster.item];
+        if(mapped_cluster == (ulib_uint) -1) {
+            mapped_cluster = mapping[*cluster.item] = expected_clusters[cluster.i];
         }
 
-        if(cluster != expected_clusters[_cluster.i]) {
+        if(mapped_cluster != expected_clusters[cluster.i]) {
             errors += 1;
         }
     }
 
     utest_assert_uint(errors, ==, 0);
     teardown_data(&data);
-    eai_cluster_deinit(&cluster_results);
+    eai_model_deinit(&model);
+
     return true;
 }
 
 bool test_eai_cluster_kmeans3(void)
 {
-    UVec(UVec(ulib_float)) data = setup_data_3();
+    EaiNArray(ulib_float) data = setup_data_3();
 
     ulib_uint errors = 0;
     ulib_uint mapping[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
@@ -108,161 +114,161 @@ bool test_eai_cluster_kmeans3(void)
         3, 5, 0, 4, 6, 2, 7, 3, 5, 7, 6, 5, 8, 5, 4, 7, 0, 4, 7, 6, 2, 7, 1, 9, 1, 3
     };
 
-    EaiKMeansConfig config = eai_cluster_kmeans_config();
-    config.n_clusters = 10;
-    config.max_iter = 2000;
+    EaiModel model = eai_cluster_kmeans(10, 1000, 3);
+    eai_model_fit(&model, &data);
 
-    EaiClusterResults cluster_results = eai_cluster_kmeans(&config, &data);
+    UVec(ulib_uint) *clusters = eai_cluster_kmeans_clusters(&model);
+    EaiNArray(ulib_float) *centroids = eai_cluster_kmeans_centroids(&model);
+    UVec(ulib_uint) *centroids_shape = eai_narray_shape(ulib_float, centroids);
 
-    uvec_foreach(ulib_uint, &cluster_results.cluster, _cluster) {
-        ulib_uint cluster = mapping[*_cluster.item];
-        if(cluster == (ulib_uint) -1) {
-            cluster = mapping[*_cluster.item] = expected_clusters[_cluster.i];
+    utest_assert_uint(uvec_first(ulib_uint, centroids_shape), ==, 10);
+    utest_assert_uint(uvec_count(ulib_uint, clusters), ==, 200);
+    ;
+
+    uvec_foreach(ulib_uint, clusters, cluster) {
+        ulib_uint mapped_cluster = mapping[*cluster.item];
+        if(mapped_cluster == (ulib_uint) -1) {
+            mapped_cluster = mapping[*cluster.item] = expected_clusters[cluster.i];
         }
 
-        if(cluster != expected_clusters[_cluster.i]) {
-            errors += 1;
-        }
-    }
-
-    utest_assert_uint(errors, <=, 20);
-    teardown_data(&data);
-    eai_cluster_deinit(&cluster_results);
-    return true;
-}
-
-bool test_eai_cluster_kmedoids1(void)
-{
-    UVec(UVec(ulib_float)) data = setup_data_1();
-    const ulib_float expected_centroids[3][2] = { { 1, 1 }, { 7, 1 }, { 4, 7 } };
-    ulib_byte found[3] = { 0, 0, 0 };
-
-    for(ulib_uint i = 0; i < 3; i++) {
-        UVec(ulib_float) sample = uvec(ulib_float);
-        uvec_push(ulib_float, &sample, expected_centroids[i][0]);
-        uvec_push(ulib_float, &sample, expected_centroids[i][1]);
-        uvec_push(UVec(ulib_float), &data, sample);
-    }
-
-    EaiKMedoidsConfig config = eai_cluster_kmedoids_config();
-    config.n_clusters = 3;
-
-    EaiClusterResults cluster_results = eai_cluster_kmedoids(&config, &data);
-    utest_assert_uint(uvec_count(UVec(ulib_float), &cluster_results.centroids), ==, 3);
-    utest_assert_uint(uvec_count(ulib_uint, &cluster_results.cluster), ==, 15);
-    utest_assert_uint(uvec_count(ulib_uint, &cluster_results.cluster_size), ==, 3);
-
-    uvec_foreach(UVec(ulib_float), &cluster_results.centroids, centroid) {
-        utest_assert_uint(uvec_count(ulib_float, centroid.item), ==, 2);
-        ulib_float x1 = uvec_get(ulib_float, centroid.item, 0);
-        ulib_float x2 = uvec_get(ulib_float, centroid.item, 1);
-
-        for(ulib_uint i = 0; i < 3; i++) {
-            if(x1 == expected_centroids[i][0] && x2 == expected_centroids[i][1]) {
-                found[i] = 1;
-            }
-        }
-    }
-
-    utest_assert_uint(found[0], ==, 1);
-    utest_assert_uint(found[1], ==, 1);
-    utest_assert_uint(found[2], ==, 1);
-    teardown_data(&data);
-    eai_cluster_deinit(&cluster_results);
-    return true;
-}
-
-bool test_eai_cluster_kmedoids2(void)
-{
-    UVec(UVec(ulib_float)) data = setup_data_2();
-
-    ulib_uint errors = 0;
-    ulib_uint mapping[3] = { -1, -1, -1 };
-    const ulib_uint expected_clusters[30] = { 0, 2, 1, 1, 0, 2, 2, 1, 2, 1, 1, 1, 0, 1, 2,
-                                              2, 0, 2, 2, 0, 2, 2, 0, 1, 0, 1, 1, 0, 0, 0 };
-
-    EaiKMedoidsConfig config = eai_cluster_kmedoids_config();
-    config.n_clusters = 3;
-    config.max_iter = 20;
-
-    EaiClusterResults cluster_results = eai_cluster_kmedoids(&config, &data);
-
-    uvec_foreach(ulib_uint, &cluster_results.cluster, _cluster) {
-        ulib_uint cluster = mapping[*_cluster.item];
-        if(cluster == (ulib_uint) -1) {
-            cluster = mapping[*_cluster.item] = expected_clusters[_cluster.i];
-        }
-
-        if(cluster != expected_clusters[_cluster.i]) {
+        if(mapped_cluster != expected_clusters[cluster.i]) {
             errors += 1;
         }
     }
 
     utest_assert_uint(errors, ==, 0);
     teardown_data(&data);
-    eai_cluster_deinit(&cluster_results);
+    eai_model_deinit(&model);
+
     return true;
 }
-
-bool test_eai_cluster_kmedoids3(void)
-{
-    UVec(UVec(ulib_float)) data = setup_data_3();
-
-    ulib_uint errors = 0;
-    ulib_uint mapping[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-    const ulib_uint expected_clusters[200] = {
-        5, 5, 0, 2, 6, 4, 9, 3, 6, 1, 3, 6, 0, 8, 5, 8, 5, 7, 8, 2, 8, 4, 8, 0, 9, 2, 6, 3, 6,
-        7, 7, 2, 6, 1, 5, 1, 3, 4, 7, 3, 5, 6, 9, 3, 7, 7, 5, 2, 4, 1, 0, 7, 4, 7, 3, 3, 3, 3,
-        4, 6, 0, 1, 7, 5, 3, 0, 4, 1, 5, 6, 5, 8, 4, 2, 0, 9, 0, 1, 2, 4, 2, 9, 6, 1, 9, 8, 3,
-        8, 5, 2, 6, 2, 2, 9, 6, 0, 8, 9, 6, 4, 8, 3, 0, 5, 2, 9, 2, 4, 8, 1, 1, 9, 1, 8, 5, 5,
-        1, 1, 8, 8, 3, 8, 4, 2, 2, 3, 2, 9, 9, 9, 4, 9, 1, 7, 6, 4, 1, 2, 0, 0, 3, 9, 0, 2, 9,
-        8, 4, 1, 9, 0, 6, 3, 4, 1, 5, 7, 8, 7, 6, 0, 0, 0, 5, 8, 4, 7, 7, 8, 1, 0, 9, 6, 7, 9,
-        3, 5, 0, 4, 6, 2, 7, 3, 5, 7, 6, 5, 8, 5, 4, 7, 0, 4, 7, 6, 2, 7, 1, 9, 1, 3
-    };
-
-    EaiKMedoidsConfig config = eai_cluster_kmedoids_config();
-    config.n_clusters = 10;
-    config.max_iter = 20;
-
-    EaiClusterResults cluster_results = eai_cluster_kmedoids(&config, &data);
-
-    uvec_foreach(ulib_uint, &cluster_results.cluster, _cluster) {
-        ulib_uint cluster = mapping[*_cluster.item];
-        if(cluster == (ulib_uint) -1) {
-            cluster = mapping[*_cluster.item] = expected_clusters[_cluster.i];
-        }
-
-        if(cluster != expected_clusters[_cluster.i]) {
-            errors += 1;
-        }
-    }
-
-    utest_assert_uint(errors, <=, 20);
-    teardown_data(&data);
-    eai_cluster_deinit(&cluster_results);
-    return true;
-}
+//
+//bool test_eai_cluster_kmedoids1(void)
+//{
+//    UVec(UVec(ulib_float)) data = setup_data_1();
+//    const ulib_float expected_centroids[3][2] = { { 1, 1 }, { 7, 1 }, { 4, 7 } };
+//    ulib_byte found[3] = { 0, 0, 0 };
+//
+//    for(ulib_uint i = 0; i < 3; i++) {
+//        UVec(ulib_float) sample = uvec(ulib_float);
+//        uvec_push(ulib_float, &sample, expected_centroids[i][0]);
+//        uvec_push(ulib_float, &sample, expected_centroids[i][1]);
+//        uvec_push(UVec(ulib_float), &data, sample);
+//    }
+//
+//    EaiKMedoidsConfig config = eai_cluster_kmedoids_config();
+//    config.n_clusters = 3;
+//
+//    EaiClusterResults cluster_results = eai_cluster_kmedoids(&config, &data);
+//    utest_assert_uint(uvec_count(UVec(ulib_float), &cluster_results.centroids), ==, 3);
+//    utest_assert_uint(uvec_count(ulib_uint, &cluster_results.cluster), ==, 15);
+//    utest_assert_uint(uvec_count(ulib_uint, &cluster_results.cluster_size), ==, 3);
+//
+//    uvec_foreach(UVec(ulib_float), &cluster_results.centroids, centroid) {
+//        utest_assert_uint(uvec_count(ulib_float, centroid.item), ==, 2);
+//        ulib_float x1 = uvec_get(ulib_float, centroid.item, 0);
+//        ulib_float x2 = uvec_get(ulib_float, centroid.item, 1);
+//
+//        for(ulib_uint i = 0; i < 3; i++) {
+//            if(x1 == expected_centroids[i][0] && x2 == expected_centroids[i][1]) {
+//                found[i] = 1;
+//            }
+//        }
+//    }
+//
+//    utest_assert_uint(found[0], ==, 1);
+//    utest_assert_uint(found[1], ==, 1);
+//    utest_assert_uint(found[2], ==, 1);
+//    teardown_data(&data);
+//    eai_cluster_deinit(&cluster_results);
+//    return true;
+//}
+//
+//bool test_eai_cluster_kmedoids2(void)
+//{
+//    UVec(UVec(ulib_float)) data = setup_data_2();
+//
+//    ulib_uint errors = 0;
+//    ulib_uint mapping[3] = { -1, -1, -1 };
+//    const ulib_uint expected_clusters[30] = { 0, 2, 1, 1, 0, 2, 2, 1, 2, 1, 1, 1, 0, 1, 2,
+//                                              2, 0, 2, 2, 0, 2, 2, 0, 1, 0, 1, 1, 0, 0, 0 };
+//
+//    EaiKMedoidsConfig config = eai_cluster_kmedoids_config();
+//    config.n_clusters = 3;
+//    config.max_iter = 20;
+//
+//    EaiClusterResults cluster_results = eai_cluster_kmedoids(&config, &data);
+//
+//    uvec_foreach(ulib_uint, &cluster_results.cluster, _cluster) {
+//        ulib_uint cluster = mapping[*_cluster.item];
+//        if(cluster == (ulib_uint) -1) {
+//            cluster = mapping[*_cluster.item] = expected_clusters[_cluster.i];
+//        }
+//
+//        if(cluster != expected_clusters[_cluster.i]) {
+//            errors += 1;
+//        }
+//    }
+//
+//    utest_assert_uint(errors, ==, 0);
+//    teardown_data(&data);
+//    eai_cluster_deinit(&cluster_results);
+//    return true;
+//}
+//
+//bool test_eai_cluster_kmedoids3(void)
+//{
+//    UVec(UVec(ulib_float)) data = setup_data_3();
+//
+//    ulib_uint errors = 0;
+//    ulib_uint mapping[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+//    const ulib_uint expected_clusters[200] = {
+//        5, 5, 0, 2, 6, 4, 9, 3, 6, 1, 3, 6, 0, 8, 5, 8, 5, 7, 8, 2, 8, 4, 8, 0, 9, 2, 6, 3, 6,
+//        7, 7, 2, 6, 1, 5, 1, 3, 4, 7, 3, 5, 6, 9, 3, 7, 7, 5, 2, 4, 1, 0, 7, 4, 7, 3, 3, 3, 3,
+//        4, 6, 0, 1, 7, 5, 3, 0, 4, 1, 5, 6, 5, 8, 4, 2, 0, 9, 0, 1, 2, 4, 2, 9, 6, 1, 9, 8, 3,
+//        8, 5, 2, 6, 2, 2, 9, 6, 0, 8, 9, 6, 4, 8, 3, 0, 5, 2, 9, 2, 4, 8, 1, 1, 9, 1, 8, 5, 5,
+//        1, 1, 8, 8, 3, 8, 4, 2, 2, 3, 2, 9, 9, 9, 4, 9, 1, 7, 6, 4, 1, 2, 0, 0, 3, 9, 0, 2, 9,
+//        8, 4, 1, 9, 0, 6, 3, 4, 1, 5, 7, 8, 7, 6, 0, 0, 0, 5, 8, 4, 7, 7, 8, 1, 0, 9, 6, 7, 9,
+//        3, 5, 0, 4, 6, 2, 7, 3, 5, 7, 6, 5, 8, 5, 4, 7, 0, 4, 7, 6, 2, 7, 1, 9, 1, 3
+//    };
+//
+//    EaiKMedoidsConfig config = eai_cluster_kmedoids_config();
+//    config.n_clusters = 10;
+//    config.max_iter = 20;
+//
+//    EaiClusterResults cluster_results = eai_cluster_kmedoids(&config, &data);
+//
+//    uvec_foreach(ulib_uint, &cluster_results.cluster, _cluster) {
+//        ulib_uint cluster = mapping[*_cluster.item];
+//        if(cluster == (ulib_uint) -1) {
+//            cluster = mapping[*_cluster.item] = expected_clusters[_cluster.i];
+//        }
+//
+//        if(cluster != expected_clusters[_cluster.i]) {
+//            errors += 1;
+//        }
+//    }
+//
+//    utest_assert_uint(errors, <=, 20);
+//    teardown_data(&data);
+//    eai_cluster_deinit(&cluster_results);
+//    return true;
+//}
 
 // Private impl ================================================================
 
-UVec(UVec(ulib_float)) setup_data_1(void)
+EaiNArray(ulib_float) setup_data_1(void)
 {
     const ulib_float test_data[12][2] = { { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 },
                                           { 6, 0 }, { 8, 0 }, { 6, 2 }, { 8, 2 },
                                           { 3, 6 }, { 5, 6 }, { 3, 8 }, { 5, 8 } };
 
-    UVec(UVec(ulib_float)) data = uvec(UVec(ulib_float));
-    for(ulib_uint i = 0; i < 12; i++) {
-        UVec(ulib_float) sample = uvec(ulib_float);
-        uvec_push(ulib_float, &sample, test_data[i][0]);
-        uvec_push(ulib_float, &sample, test_data[i][1]);
-        uvec_push(UVec(ulib_float), &data, sample);
-    }
-
+    EaiNArray(ulib_float) data = eai_narray(ulib_float, 2, 12, 2);
+    memcpy(data.storage, &test_data, 12 * 2 * sizeof(ulib_float));
     return data;
 }
 
-UVec(UVec(ulib_float)) setup_data_2(void)
+EaiNArray(ulib_float) setup_data_2(void)
 {
     const ulib_float test_data[30][4] = { { -7.62130105, -0.70503551, -2.3091796, -1.95660285 },
                                           { -10.47904839, 1.25684119, -1.31712237, -1.84331046 },
@@ -295,20 +301,12 @@ UVec(UVec(ulib_float)) setup_data_2(void)
                                           { -4.8058991, -2.29289946, -5.69147087, -1.95341736 },
                                           { -7.61172458, -1.88653029, -4.27342351, -2.8144317 } };
 
-    UVec(UVec(ulib_float)) data = uvec(UVec(ulib_float));
-    for(ulib_uint i = 0; i < 30; i++) {
-        UVec(ulib_float) sample = uvec(ulib_float);
-        uvec_push(ulib_float, &sample, test_data[i][0]);
-        uvec_push(ulib_float, &sample, test_data[i][1]);
-        uvec_push(ulib_float, &sample, test_data[i][2]);
-        uvec_push(ulib_float, &sample, test_data[i][3]);
-        uvec_push(UVec(ulib_float), &data, sample);
-    }
-
+    EaiNArray(ulib_float) data = eai_narray(ulib_float, 2, 30, 4);
+    memcpy(data.storage, &test_data, 30 * 4 * sizeof(ulib_float));
     return data;
 }
 
-UVec(UVec(ulib_float)) setup_data_3(void)
+EaiNArray(ulib_float) setup_data_3(void)
 {
     const ulib_float test_data[200][8] = { { -7.36935960E+00,
                                              -8.96519250E+00,
@@ -1911,28 +1909,13 @@ UVec(UVec(ulib_float)) setup_data_3(void)
                                              -8.56543099E+00,
                                              4.97359258E+00 } };
 
-    UVec(UVec(ulib_float)) data = uvec(UVec(ulib_float));
-    for(ulib_uint i = 0; i < 200; i++) {
-        UVec(ulib_float) sample = uvec(ulib_float);
-        uvec_push(ulib_float, &sample, test_data[i][0]);
-        uvec_push(ulib_float, &sample, test_data[i][1]);
-        uvec_push(ulib_float, &sample, test_data[i][2]);
-        uvec_push(ulib_float, &sample, test_data[i][3]);
-        uvec_push(ulib_float, &sample, test_data[i][4]);
-        uvec_push(ulib_float, &sample, test_data[i][5]);
-        uvec_push(ulib_float, &sample, test_data[i][6]);
-        uvec_push(ulib_float, &sample, test_data[i][7]);
-        uvec_push(UVec(ulib_float), &data, sample);
-    }
-
+    EaiNArray(ulib_float) data = eai_narray(ulib_float, 2, 200, 8);
+    memcpy(data.storage, &test_data, 200 * 8 * sizeof(ulib_float));
     return data;
 }
 
-void teardown_data(UVec(UVec(ulib_float)) * data)
+void teardown_data(EaiNArray(ulib_float) * data)
 {
-    uvec_foreach(UVec(ulib_float), data, _sample) {
-        uvec_deinit(ulib_float, _sample.item);
-    }
-    uvec_deinit(UVec(ulib_float), data);
+    eai_narray_deinit(ulib_float, data);
 }
 

@@ -25,60 +25,39 @@
 #ifndef EAI_TOOLBOX_EAI_CLUSTER_H
 #define EAI_TOOLBOX_EAI_CLUSTER_H
 
-#include <ulib.h>
-
-#include "eai_narray_builtin.h"
-
-typedef struct EaiClusterResults_s {
-    EaiNArray(ulib_float) centroids;
-    UVec(ulib_uint) cluster;
-    UVec(ulib_uint) cluster_size;
-} EaiClusterResults;
-
-typedef struct EaiKMeansConfig_s {
-    ulib_uint max_iter;
-    ulib_uint n_clusters;
-    ulib_uint seed;
-} EaiKMeansConfig;
-
-typedef struct EaiKMedoidsConfig_s {
-    ulib_uint max_iter;
-    ulib_uint n_clusters;
-    ulib_uint seed;
-} EaiKMedoidsConfig;
+#include "eai_model.h"
 
 /**
- * @return an instance of EaiKMeansConfig initialized with default values
+ * @param n_cluster the number of clusters
+ * @param max_iter the maximum number of iterations
+ * @param seed seed for RNG
+ * @return EaiModel for KMeans
  */
-EaiKMeansConfig eai_cluster_kmeans_config(void);
+EaiModel eai_cluster_kmeans(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint seed);
 
 /**
- * Execute kmeans on the supplied data matrix
- * @param config algorithm configuration
- * @param data dataset to cluster
- * @return the results of the clustering
+ * @param model a trained kmeans model
+ * @return a vector of integers, where the i-th elements contains the cluster id of the i-th training
+ *         sample
+ * @note null is returned if model is not trained
+ * @note the returned vector has the same lifetime as EaiModel and should not manually de-inited
  */
-EaiClusterResults eai_cluster_kmeans(EaiKMeansConfig *config, EaiNArray(ulib_float) *data);
-
+UVec(ulib_uint) *eai_cluster_kmeans_clusters(EaiModel *model);
 
 /**
- * @return an instance of EaiKMedoidsConfig initialized with default values
+ * @param model a trained kmeans model
+ * @return a narray of floats, where the i-th row is the centroid of the cluster having i as cluster id
+ * @note null is returned if model is not trained
+ * @note the returned narray has the same lifetime as EaiModel and should not manually de-inited
  */
-EaiKMedoidsConfig eai_cluster_kmedoids_config(void);
+EaiNArray(ulib_float) *eai_cluster_kmeans_centroids(EaiModel *model);
 
 /**
- * Execute kmedoids on the supplied data matrix
- * @param config algorithm configuration
- * @param data dataset to cluster
- * @return the results of the clustering
+ * @param n_cluster the number of clusters
+ * @param max_iter the maximum number of iterations
+ * @param seed seed for RNG
+ * @return EaiModel for KMedoids
  */
-EaiClusterResults eai_cluster_kmedoids(EaiKMedoidsConfig *config, EaiNArray(ulib_float) *data);
-
-/**
- * Free up memory allocated for EaiClusterResults structure
- * @param results the result
- */
-void eai_cluster_deinit(EaiClusterResults *results);
-
+EaiModel eai_cluster_kmedoids(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint seed);
 
 #endif

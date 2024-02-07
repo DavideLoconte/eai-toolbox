@@ -28,12 +28,6 @@
 #include <stdarg.h>
 #include <ulib.h>
 
-//typedef struct EaiNArray_s_ulib_uint {
-//    UVec(ulib_float) shape;
-//    ulib_uint *storage;
-//    ulib_byte flags;
-//} EaiNArray;
-
 /**
  * Declares a new n-dimensional array type
  * @param TYPE array type
@@ -55,13 +49,15 @@
     EaiNArray_##TYPE eai_narray_##TYPE(ulib_uint dimensions, ...);                                 \
                                                                                                    \
     EaiNArray_##TYPE eai_narray_from_shape_##TYPE(UVec(ulib_uint) *shape);                         \
-    TYPE eai_narray_get_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c);         \
-    TYPE *eai_narray_get_ref_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c);    \
-    TYPE eai_narray_set_from_coordinates_##TYPE(EaiNArray_##TYPE *na, TYPE val, UVec(ulib_uint) *c);\
+    TYPE eai_narray_value_at_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c);    \
+    TYPE *eai_narray_value_at_ref_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c);    \
+    TYPE eai_narray_set_value_at_from_coordinates_##TYPE(EaiNArray_##TYPE *na, TYPE val, UVec(ulib_uint) *c); \
                                                                                                    \
-    TYPE eai_narray_get_##TYPE(EaiNArray_##TYPE *na, ...);                                         \
-    TYPE *eai_narray_get_ref_##TYPE(EaiNArray_##TYPE *na, ...);                                    \
-    TYPE eai_narray_set_##TYPE(EaiNArray_##TYPE *na, TYPE val, ...);                               \
+    EaiNArray_##TYPE eai_narray_get_##TYPE(EaiNArray_##TYPE *na, ulib_uint idx);                   \
+                                                                                                   \
+    TYPE eai_narray_value_at_##TYPE(EaiNArray_##TYPE *na, ...);                                    \
+    TYPE *eai_narray_value_at_ref_##TYPE(EaiNArray_##TYPE *na, ...);                               \
+    TYPE eai_narray_set_value_at_##TYPE(EaiNArray_##TYPE *na, TYPE val, ...);                      \
     void eai_narray_deinit_##TYPE(EaiNArray_##TYPE *na);                                           \
                                                                                                    \
     ulib_uint eai_narray_count_##TYPE(EaiNArray_##TYPE *na, ulib_uint axis);                       \
@@ -115,7 +111,7 @@
         return result;                                                                             \
     }                                                                                              \
                                                                                                    \
-    TYPE eai_narray_get_##TYPE(EaiNArray_##TYPE *na, ...)                                          \
+    TYPE eai_narray_value_at_##TYPE(EaiNArray_##TYPE *na, ...)                                          \
     {                                                                                              \
         ulib_uint index = 0;                                                                       \
         va_list argptr;                                                                            \
@@ -130,7 +126,7 @@
         return na->storage[index];                                                                 \
     }                                                                                              \
                                                                                                    \
-    TYPE *eai_narray_get_ref_##TYPE(EaiNArray_##TYPE *na, ...)                                     \
+    TYPE *eai_narray_value_at_ref_##TYPE(EaiNArray_##TYPE *na, ...)                                     \
     {                                                                                              \
         ulib_uint index = 0;                                                                       \
         va_list argptr;                                                                            \
@@ -144,7 +140,7 @@
         return &na->storage[index];                                                                \
     }                                                                                              \
                                                                                                    \
-    TYPE eai_narray_set_##TYPE(EaiNArray_##TYPE *na, TYPE val, ...)                                \
+    TYPE eai_narray_set_value_at_##TYPE(EaiNArray_##TYPE *na, TYPE val, ...)                                \
     {                                                                                              \
         ulib_uint index = 0;                                                                       \
         TYPE old_val;                                                                              \
@@ -211,7 +207,7 @@
         iter->item.storage = &iter->_storage[iter->i * iter->_view_size];                           \
     }                                                                                              \
                                                                                                    \
-    TYPE eai_narray_get_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c){         \
+    TYPE eai_narray_value_at_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c){    \
         ulib_uint index = 0;                                                                       \
         ulib_uint *shape_data = uvec_data(ulib_uint, &na->shape);                                  \
                                                                                                    \
@@ -224,7 +220,7 @@
         return na->storage[index];                                                                 \
     }                                                                                              \
                                                                                                    \
-    TYPE *eai_narray_get_ref_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c){    \
+    TYPE *eai_narray_value_at_ref_from_coordinates_##TYPE(EaiNArray_##TYPE *na, UVec(ulib_uint) *c){    \
         ulib_uint index = 0;                                                                       \
         ulib_uint *shape_data = uvec_data(ulib_uint, &na->shape);                                  \
                                                                                                    \
@@ -237,7 +233,7 @@
         return &na->storage[index];                                                                 \
     }                                                                                              \
                                                                                                    \
-    TYPE eai_narray_set_from_coordinates_##TYPE(EaiNArray_##TYPE *na, TYPE val, UVec(ulib_uint) *c)\
+    TYPE eai_narray_set_value_at_from_coordinates_##TYPE(EaiNArray_##TYPE *na, TYPE val, UVec(ulib_uint) *c)\
     {                                                                                               \
         ulib_uint index = 0;                                                                       \
         ulib_uint *shape_data = uvec_data(ulib_uint, &na->shape);                                  \
@@ -260,6 +256,22 @@
             ret *= *dim.item;                                                                      \
         }                                                                                          \
         return ret;                                                                                \
+    }                                                                                              \
+                                                                                                   \
+    EaiNArray_##TYPE eai_narray_get_##TYPE(EaiNArray_##TYPE *na, ulib_uint idx)                    \
+    {                                                                                              \
+        EaiNArray(TYPE) item;                                                                      \
+        const ulib_uint dims = uvec_count(ulib_uint, &na->shape);                                  \
+        ulib_uint *shape_data = uvec_data(ulib_uint, &na->shape);                                  \
+        ulib_uint view_size = 1;                                                                   \
+                                                                                                   \
+        for(ulib_uint i = 1; i < dims; i++) {                                                      \
+            view_size *= shape_data[i];                                                            \
+        }                                                                                          \
+                                                                                                   \
+        item.shape = uvec_wrap(ulib_uint, &shape_data[1], dims - 1);                               \
+        item.storage = &na->storage[idx * view_size];                                              \
+        return item;                                                                               \
     }
 
 /**
@@ -283,7 +295,7 @@
  * @param ... coordinates of the element for each dimension
  * @return the element indexed by the coordinates
  */
-#define eai_narray_get(type, array, ...) eai_narray_get_##type(array, __VA_ARGS__)
+#define eai_narray_value_at(type, array, ...) eai_narray_value_at_##type(array, __VA_ARGS__)
 
 /**
  * @param type the type of data stored in the elements of the array
@@ -291,7 +303,7 @@
  * @param ... coordinates of the element for each dimension
  * @return the memory address of the element indexed by the coordinates
  */
-#define eai_narray_get_ref(type, array, ...) eai_narray_get_ref_##type(array, __VA_ARGS__)
+#define eai_narray_value_at_ref(type, array, ...) eai_narray_value_at_ref_##type(array, __VA_ARGS__)
 
 /**
  * @param type the type of data stored in the elements of the array
@@ -300,7 +312,7 @@
  * @param ... the coordinates of the element for each dimension
  * @return the replaced value
  */
-#define eai_narray_set(type, array, val, ...) eai_narray_set_##type(array, val, __VA_ARGS__)
+#define eai_narray_set_value_at(type, array, val, ...) eai_narray_set_value_at_##type(array, val, __VA_ARGS__)
 
 /**
  * Deinit a n-dimensional array
@@ -341,7 +353,7 @@
  * @param coordinates a vector containing the coordinates of the element for each dimension
  * @return the element indexed by the coordinates
  */
-#define eai_narray_get_from_coordinates(type, array, coordinates) eai_narray_get_from_coordinates_##type(array, coordinates)
+#define eai_narray_value_at_from_coordinates(type, array, coordinates) eai_narray_value_at_from_coordinates_##type(array, coordinates)
 
 /**
  * @param type the type of data stored in the elements of the array
@@ -349,7 +361,7 @@
  * @param coordinates a vector containing the coordinates of the element for each dimension
  * @return a reference to the element indexed by the coordinates
  */
-#define eai_narray_get_ref_from_coordinates(type, array, coordinates) eai_narray_get_ref_from_coordinates_##type(array, coordinates)
+#define eai_narray_value_at_ref_from_coordinates(type, array, coordinates) eai_narray_value_at_ref_from_coordinates_##type(array, coordinates)
 
 /**
  * @param type the type of data stored in the elements of the array
@@ -358,7 +370,7 @@
  * @param coordinates a vector containing the coordinates of the element for each dimension
  * @return the value being replaced
  */
-#define eai_narray_set_from_coordinates(type, array, val, coordinates) eai_narray_set_from_coordinates_##type(array, val, coordinates)
+#define eai_narray_set_value_at_from_coordinates(type, array, val, coordinates) eai_narray_set_value_at_from_coordinates_##type(array, val, coordinates)
 
 /**
  * @param type the type of data stored in the elements of the array
@@ -383,5 +395,16 @@
 #define eai_narray_foreach(type, array, iter) for(EaiNArray_loop_##type iter = p_eai_narray_init_loop_##type(array);    \
                                                   iter.i != iter.count;                                                 \
                                                   p_eai_narray_next_loop_##type(&iter))
+
+/**
+ * @param type the type of the narray
+ * @param array the array
+ * @param idx the index
+ * @return the sub-narray at the specified index for the first axis
+ * @note the returned narray is a view, and should not be deallocated.
+ *       Changes on this array propagates to the original array.
+ *       Lifetime of this narray is tied to the starting narray
+ */
+#define eai_narray_get(type, array, idx) eai_narray_get_##type(array, idx)
 
 #endif
