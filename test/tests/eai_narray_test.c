@@ -49,23 +49,23 @@ bool eai_narray_get_test(void)
 bool eai_narray_shape_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 1, 2, 3);
-    EaiNArray(ulib_byte) array2 = eai_narray(ulib_byte, 5, 1, 2, 3, 4, 5);
+    EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 5, 1, 2, 3, 4, 5);
 
     utest_assert_uint(eai_narray_axes(ulib_float, &array), ==, 3);
-    utest_assert_uint(eai_narray_axes(ulib_byte, &array2), ==, 5);
+    utest_assert_uint(eai_narray_axes(ulib_uint, &array2), ==, 5);
 
     utest_assert_uint(eai_narray_count(ulib_float, &array, 0), ==, 1);
     utest_assert_uint(eai_narray_count(ulib_float, &array, 1), ==, 2);
     utest_assert_uint(eai_narray_count(ulib_float, &array, 2), ==, 3);
 
-    utest_assert_uint(eai_narray_count(ulib_byte, &array2, 0), ==, 1);
-    utest_assert_uint(eai_narray_count(ulib_byte, &array2, 1), ==, 2);
-    utest_assert_uint(eai_narray_count(ulib_byte, &array2, 2), ==, 3);
-    utest_assert_uint(eai_narray_count(ulib_byte, &array2, 3), ==, 4);
-    utest_assert_uint(eai_narray_count(ulib_byte, &array2, 4), ==, 5);
+    utest_assert_uint(eai_narray_count(ulib_uint, &array2, 0), ==, 1);
+    utest_assert_uint(eai_narray_count(ulib_uint, &array2, 1), ==, 2);
+    utest_assert_uint(eai_narray_count(ulib_uint, &array2, 2), ==, 3);
+    utest_assert_uint(eai_narray_count(ulib_uint, &array2, 3), ==, 4);
+    utest_assert_uint(eai_narray_count(ulib_uint, &array2, 4), ==, 5);
 
     eai_narray_deinit(ulib_float, &array);
-    eai_narray_deinit(ulib_byte, &array2);
+    eai_narray_deinit(ulib_uint, &array2);
     return true;
 }
 

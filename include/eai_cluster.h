@@ -60,4 +60,21 @@ EaiNArray(ulib_float) *eai_cluster_kmeans_centroids(EaiModel *model);
  */
 EaiModel eai_cluster_kmedoids(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint seed);
 
+/**
+ * @param model a trained kmeans model
+ * @return a vector of integers, where the i-th elements contains the cluster id of the i-th training
+ *         sample
+ * @note null is returned if model is not trained
+ * @note the returned vector has the same lifetime as EaiModel and should not manually de-inited
+ */
+UVec(ulib_uint) *eai_cluster_kmedoids_clusters(EaiModel *model);
+
+/**
+ * @param model a trained kmeans model
+ * @return a narray of floats, where the i-th row is the centroid of the cluster having i as cluster id
+ * @note null is returned if model is not trained
+ * @note the returned narray has the same lifetime as EaiModel and should not manually de-inited
+ */
+EaiNArray(ulib_float) *eai_cluster_kmedoids_centroids(EaiModel *model);
+
 #endif

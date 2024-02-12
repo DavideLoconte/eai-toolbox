@@ -30,9 +30,6 @@
 
 EAI_NARRAY_DECL(ulib_uint)
 EAI_NARRAY_DECL(ulib_int)
-EAI_NARRAY_DECL(ulib_byte)
 EAI_NARRAY_DECL(ulib_float)
-
-EaiNArray_ulib_float deb_eai_narray_get_ulib_float(EaiNArray_ulib_float *na, ulib_uint idx);
 
 #endif
