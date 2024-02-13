@@ -62,13 +62,6 @@ static void eai_kmedoids_init_ctx(EaiKMedoids *model, EaiNArray(ulib_float) *dat
 static void eai_kmedoids_precompute_distances(EaiKMedoids *model, EaiNArray(ulib_float) *data);
 
 /**
- * Select initial centroids for kmedoids
- * @param model the model
- * @param data the data
- */
-static void eai_kmedoids_select_initial_centroids(EaiKMedoids *model, EaiNArray(ulib_float) *data);
-
-/**
  * Overall cost of the current solution
  * @param model the model
  * @param data the data
@@ -106,6 +99,36 @@ static void eai_kmedoids_assign_clusters(EaiKMedoids *model);
  * @param data the data
  */
 static void eai_kmedoids_copy_centroids(EaiKMedoids *model, EaiNArray(ulib_float) *data);
+
+/**
+ * In the context of KMedoids++, select a point as first cluster with a probability
+ * proportional to the distance from the nearest centroid
+ * @param distances a vector where the i-th element is the distance of the i-th point
+ *                  to the nearest centroid
+ * @param sum the sum of all distances
+ * @param bag an inited and empty uvec of ulib_uint, it is used to perform extraction
+ *            this is passed externally to avoid multiple alloc of a vector
+ * @return a point selected with probability proportionally from distances
+ */
+static ulib_uint eai_kmedoids_select_cluster_from_distance(UVec(ulib_float) *distances, ulib_float sum, UVec(ulib_uint) *bag);
+
+/**
+ * In the context of KMedoids++, update distances vector so that the i-th element
+ * is the distance of the i-th data point from the nearest neighbor
+ * @param model the model
+ * @param data the training data
+ * @param clusters a vector containing all the cluster currently assigned (at least 1)
+ * @param distances [out] the vector that will be populated with the distances
+ * @return sum of all value contained in distances vector
+ */
+static ulib_float eai_kmedoids_distance_update(EaiKMedoids *model, EaiNArray(ulib_float) *data, UVec(ulib_float) *distances);
+
+/**
+ * Init the uvec structures in KMeans using KMedoids++
+ * @param model the model
+ * @param data the training data
+ */
+static void eai_kmedoids_select_random_centroids(EaiKMedoids *model, EaiNArray(ulib_float) *data);
 
 // Public impl =====================================================================================
 
@@ -151,6 +174,15 @@ EaiNArray(ulib_float) *eai_cluster_kmedoids_centroids(EaiModel *model)
     return &ctx->centroids;
 }
 
+UVec(ulib_uint) *eai_cluster_kmedoids_medoids(EaiModel *model)
+{
+    EaiKMedoids *ctx = model->ctx;
+    if (!ctx->trained) {
+        return NULL;
+    }
+    return &ctx->medoids;
+}
+
 
 // Private impl ====================================================================================
 
@@ -171,11 +203,11 @@ static void eai_kmedoids_fit(void *m, EaiNArray(ulib_float) *data, ...)
     EaiKMedoids *model = m;
     eai_kmedoids_init_ctx(m, data);
     eai_kmedoids_precompute_distances(m, data);
-    eai_kmedoids_select_initial_centroids(m, data);
+    eai_kmedoids_select_random_centroids(model, data);
     eai_kmedoids_assign_clusters(m);
 
     for (ulib_uint i = 0; i < model->max_iter; i++) {
-        if (!eai_kmedoids_swap_step(model, i)) {
+        if (!eai_kmedoids_swap_step(model, i) && i > model->n_clusters) {
             break;
         }
     }
@@ -213,38 +245,6 @@ static void eai_kmedoids_precompute_distances(EaiKMedoids *model, EaiNArray(ulib
             }
         }
     }
-}
-
-static void eai_kmedoids_select_initial_centroids(EaiKMedoids *model, EaiNArray(ulib_float) *data)
-{
-    UVec(ulib_float) sums = uvec(ulib_float);
-    UVec(ulib_uint) points = uvec(ulib_uint);
-
-    eai_narray_foreach(ulib_float, data, sample) {
-        ulib_float sum = 0;
-        ulib_uint i;
-
-        eai_narray_foreach(ulib_float, data, other_sample) {
-            sum += eai_narray_value_at(ulib_float, &model->distances, sample.i, other_sample.i);
-        }
-
-        uvec_insert_sorted(ulib_float, &sums, sum, &i);
-        uvec_push(ulib_uint, &points, i);
-    }
-
-    uvec_foreach(ulib_uint, &points, point) {
-        if(point.i >= model->n_clusters) break;
-        uvec_push(ulib_uint, &model->medoids, *point.item);
-
-        EaiNArray(ulib_float) sample = eai_narray_get(ulib_float, data, *point.item);
-        EaiNArray(ulib_float) centroid = eai_narray_get(ulib_float, &model->centroids, *point.item);
-        memcpy(centroid.storage, sample.storage, eai_narray_size(ulib_float, &sample));
-
-        uvec_push(ulib_uint, &model->cluster_size, 0);
-    }
-
-    uvec_deinit(ulib_float, &sums);
-    uvec_deinit(ulib_uint, &points);
 }
 
 static ulib_float eai_kmedoids_compute_cost(EaiKMedoids *model)
@@ -297,15 +297,16 @@ static void eai_kmedoids_assign_clusters(EaiKMedoids *model)
         ulib_uint current_point = i;
 
         ulib_uint min_cluster = cluster_data[current_point];
-        ulib_float min_cluster_dist = eai_narray_value_at(ulib_float, &model->distances, current_point, min_cluster);
+        ulib_uint min_medoid = medoids_data[min_cluster];
+        ulib_float min_cluster_dist = eai_narray_value_at(ulib_float, &model->distances, current_point, min_medoid);
 
         for (ulib_uint j = 0; j < model->n_clusters; j++) {
             ulib_uint new_cluster = j;
-            ulib_float new_cluster_dist = eai_narray_value_at(ulib_float, &model->distances, current_point, new_cluster);
+            ulib_uint new_medoid = medoids_data[new_cluster];
+            ulib_float new_cluster_dist = eai_narray_value_at(ulib_float, &model->distances, current_point, new_medoid);
 
             if (new_cluster_dist < min_cluster_dist) {
-                medoids_data[new_cluster] = current_point;
-                cluster_data[current_point] = new_cluster;
+                cluster_data[current_point] = j;
             }
         }
     }
@@ -368,3 +369,61 @@ static ulib_float eai_kmedoids_score(void *m, EaiNArray(ulib_float) *data, ...)
     return ret;
 }
 
+static ulib_float eai_kmedoids_distance_update(EaiKMedoids *model, EaiNArray(ulib_float) *data, UVec(ulib_float) *distances)
+{
+    ulib_float sum = 0;
+
+    uvec_remove_all(ulib_float, distances);
+    eai_narray_foreach(ulib_float, data, sample)
+    {
+        ulib_float min_cluster_dist = ULIB_FLOAT_MAX;
+
+        uvec_foreach(ulib_uint, &model->medoids, cluster) {
+            ulib_float dist = eai_narray_value_at(ulib_float, &model->distances, *cluster.item, sample.i);
+            if(dist < min_cluster_dist) {
+                min_cluster_dist = dist;
+            }
+        }
+
+        uvec_push(ulib_float, distances, min_cluster_dist);
+        sum += min_cluster_dist;
+    }
+
+    return sum;
+}
+
+static ulib_uint eai_kmedoids_select_cluster_from_distance(UVec(ulib_float) *distances, ulib_float sum, UVec(ulib_uint) *bag)
+{
+    uvec_remove_all(ulib_uint, bag);
+    uvec_reserve(ulib_uint, bag, (ulib_uint) (sum + 1));
+
+    uvec_foreach(ulib_float, distances, item) {
+        ulib_uint val = (ulib_uint) *item.item;
+        for(ulib_uint i = 0; i < val; i++) {
+            uvec_push(ulib_uint, bag, item.i);
+        }
+    }
+
+    ulib_uint random_choice = rand() % uvec_count(ulib_uint, bag);
+    ulib_uint ret = uvec_get(ulib_uint, bag, random_choice);
+
+    return ret;
+}
+
+static void eai_kmedoids_select_random_centroids(EaiKMedoids *model, EaiNArray(ulib_float) *data)
+{
+    UVec(ulib_float) distances = uvec(ulib_float);
+    UVec(ulib_uint) bag = uvec(ulib_uint);
+
+    ulib_uint cluster = rand() % model->data_count;
+    uvec_push(ulib_uint, &model->medoids, cluster);
+
+    do {
+        ulib_float distance_sum = eai_kmedoids_distance_update(model, data, &distances);
+        cluster = eai_kmedoids_select_cluster_from_distance(&distances, distance_sum, &bag);
+        uvec_push(ulib_uint, &model->medoids, cluster);
+    } while (uvec_count(ulib_uint, &model->medoids) < model->n_clusters);
+
+    uvec_deinit(ulib_float, &distances);
+    uvec_deinit(ulib_uint, &bag);
+}

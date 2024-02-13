@@ -98,9 +98,8 @@ static void eai_kmeans_update(EaiKMeans *model, EaiNArray(ulib_float) *data);
 /**
  * Update KMeans internal data with the newly assigned clusters
  * @param model the model
- * @param data the training data
  */
-static void eai_kmeans_reset_centroids(EaiKMeans *model, EaiNArray(ulib_float) *data);
+static void eai_kmeans_reset_centroids(EaiKMeans *model);
 
 /**
  * If an empty cluster is encoutered, it will be randomly reassigned to another point
@@ -117,8 +116,8 @@ EaiModel eai_cluster_kmeans(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint s
 
     model.ctx = malloc(sizeof(EaiKMeans));
     model.fit = &eai_kmeans_fit;
-    model.predict = NULL;
-    model.score = NULL;
+    model.predict = &eai_kmeans_predict;
+    model.score = &eai_kmeans_score;
     model.deinit = &eai_kmeans_deinit;
     model.partial_fit = NULL;
 
@@ -285,7 +284,7 @@ static void eai_kmeans_assign_clusters(EaiKMeans *model, EaiNArray(ulib_float) *
 
 static void eai_kmeans_update(EaiKMeans *model, EaiNArray(ulib_float) *data)
 {
-    eai_kmeans_reset_centroids(model, data);
+    eai_kmeans_reset_centroids(model);
 
     eai_narray_foreach(ulib_float, data, sample) {
         ulib_uint cluster = uvec_get(ulib_uint, &model->cluster, sample.i);
@@ -308,7 +307,7 @@ static void eai_kmeans_update(EaiKMeans *model, EaiNArray(ulib_float) *data)
     }
 }
 
-static void eai_kmeans_reset_centroids(EaiKMeans *model, EaiNArray(ulib_float) *data)
+static void eai_kmeans_reset_centroids(EaiKMeans *model)
 {
     ulib_uint *cluster_size_data = uvec_data(ulib_uint, &model->cluster_size);
 

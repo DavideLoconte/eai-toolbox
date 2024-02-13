@@ -77,4 +77,12 @@ UVec(ulib_uint) *eai_cluster_kmedoids_clusters(EaiModel *model);
  */
 EaiNArray(ulib_float) *eai_cluster_kmedoids_centroids(EaiModel *model);
 
+/**
+ * @param model a trained kmeans model
+ * @return a vector of uint, where the i-th element is the index of the medoid in the original training data
+ * @note null is returned if model is not trained
+ * @note the returned narray has the same lifetime as EaiModel and should not manually de-inited
+ */
+UVec(ulib_uint) *eai_cluster_kmedoids_medoids(EaiModel *model);
+
 #endif
