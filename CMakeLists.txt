@@ -4,12 +4,12 @@ project(eai_toolbox C)
 set(CMAKE_C_STANDARD 11)
 
 set(EAI_TOOLBOX_VERSION_MAJOR 0)
-set(EAI_TOOLBOX_VERSION_MINOR 1)
-set(EAI_TOOLBOX_VERSION_PATCH 1)
+set(EAI_TOOLBOX_VERSION_MINOR 2)
+set(EAI_TOOLBOX_VERSION_PATCH 0)
 set(EAI_TOOLBOX_VERSION "${EAI_TOOLBOX_VERSION_MAJOR}.${EAI_TOOLBOX_VERSION_MINOR}.${EAI_TOOLBOX_VERSION_PATCH}")
 
 set(EAI_TOOLBOX_AUTHOR "Davide Loconte")
-set(EAI_TOOLBOX_COPYRIGHT_YEAR "2022-2023")
+set(EAI_TOOLBOX_COPYRIGHT_YEAR "2022-2024")
 
 option(EAI_TOOLBOX_LTO "Enable link-time optimization, if available" ON)
 
@@ -50,7 +50,7 @@ if (NOT TARGET ulib)
     FetchContent_Declare(
             ulib
             GIT_REPOSITORY https://github.com/IvanoBilenchi/ulib.git
-            GIT_TAG a3dde96c2a3807e825520344efa07287bfcc6fd8
+            GIT_TAG c89c7b8e356bbedff78a08ef0da27275cffcce35
     )
     FetchContent_MakeAvailable(ulib)
     set(ULIB_HEADERS_DIR ${ULIB_PUBLIC_HEADERS_DIR})

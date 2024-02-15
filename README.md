@@ -8,15 +8,12 @@ This repository contains a lightweight C library that provides various utilities
 - Confusion matrix generator: Compute confusion matrices to evaluate classification model performance.
 - Regression accuracy metrics: Calculate accuracy metrics for regression models.
 - Directed Acyclic Graph (DAG) implementation: Implement and manipulate DAG structures for various applications.
+- Generic N-dimensional array. 
+- Scikit-Learn :wlike interface for machine learning algorithms, with two clustering algorithms implementation (KMeans and KMedoids)
 
 ## Future Work
 
-The current version of this library provides a basic set of utilities for machine learning and artificial intelligence applications. However, the library will continue to evolve and expand its functionalities. Future updates may include additional algorithms, optimizations for edge devices, and more lightweight utility functions. Contributions and suggestions are welcome!
-
-Currently the library lacks an structured documentation. You can refer to the sources in `test/tests` for some usage examples, as well as to library headers in `include` for function description.
-
-## Acknowledgements
-O would like to acknowledge [Ivano Bilenchi](https://ivanobilenchi.com) for providing [uLib](https://github.com/IvanoBilenchi/ulib), a memory-efficient modern C base library which serves as a base for this project. 
+The current version of this library provides a basic set of utilities for machine learning and artificial intelligence applications. However, the library will continue to evolve and expand its functionalities. Future updates may include additional algorithms, optimizations for edge devices, and more lightweight utility functions.
 
 ## License
 

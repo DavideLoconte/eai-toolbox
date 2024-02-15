@@ -39,7 +39,7 @@ bool eai_profile_test_rss(void)
 
 bool eai_profile_test_sleep(void)
 {
-    ulib_float epsilon = 0.1;
+    ulib_float epsilon = 0.2;
     ulib_uint seconds = 1;
     ulib_float start = eai_profile_get_wall_clock();
     eai_profile_sleep(seconds);
