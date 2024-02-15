@@ -73,10 +73,10 @@ static ulib_float eai_kmedoids_compute_cost(EaiKMedoids *model);
  * Perform the swap step of the kmedoids algorithm, that is swapping the medoids
  * with all points in the cluster
  * @param model the model
- * @param iteration the iteration index
+ * @param cluster the cluster (index) to swap
  * @return true if a swap has occurred
  */
-static ulib_byte eai_kmedoids_swap_step(EaiKMedoids *model, ulib_uint iteration);
+static ulib_byte eai_kmedoids_swap_step(EaiKMedoids *model, ulib_uint cluster);
 
 /**
  * Swap medoid with the specified data index, and recompute clusters
@@ -194,6 +194,7 @@ static void eai_kmedoids_deinit(void *m)
         eai_narray_deinit(ulib_float, &ctx->distances);
         uvec_deinit(ulib_uint, &ctx->cluster);
         uvec_deinit(ulib_uint, &ctx->cluster_size);
+        uvec_deinit(ulib_uint, &ctx->medoids);
     }
     free(ctx);
 }
@@ -207,9 +208,12 @@ static void eai_kmedoids_fit(void *m, EaiNArray(ulib_float) *data, ...)
     eai_kmedoids_assign_clusters(m);
 
     for (ulib_uint i = 0; i < model->max_iter; i++) {
-        if (!eai_kmedoids_swap_step(model, i) && i > model->n_clusters) {
-            break;
+        ulib_byte swap_occurred = false;
+        for (ulib_uint j = 0; j < model->n_clusters; j++) {
+            swap_occurred = eai_kmedoids_swap_step(model, j) || swap_occurred;
         }
+
+        if (!swap_occurred) break;
     }
 
     eai_kmedoids_copy_centroids(m, data);
@@ -258,20 +262,21 @@ static ulib_float eai_kmedoids_compute_cost(EaiKMedoids *model)
     return sum;
 }
 
-static ulib_byte eai_kmedoids_swap_step(EaiKMedoids *model, ulib_uint iteration)
+static ulib_byte eai_kmedoids_swap_step(EaiKMedoids *model, ulib_uint cluster)
 {
     ulib_byte swapped = 0;
-
-    const ulib_uint cluster = iteration % model->n_clusters;
     const ulib_uint medoid = uvec_get(ulib_uint, &model->medoids, cluster);
 
     ulib_uint min_swap = medoid;
     ulib_float min_cost = eai_kmedoids_compute_cost(model);
 
     for(ulib_uint i = 0; i < model->data_count; i++) {
+        if (uvec_contains(ulib_uint, &model->medoids, i)) continue; // Skip medoids
+
         eai_kmedoids_swap_medoids(model, cluster, i);
         ulib_float cost = eai_kmedoids_compute_cost(model);
-        if(min_cost > cost) {
+
+        if(cost < min_cost) {
             min_cost = cost;
             swapped = 1;
             min_swap = i;
@@ -293,20 +298,17 @@ static void eai_kmedoids_assign_clusters(EaiKMedoids *model)
     ulib_uint *cluster_data = uvec_data(ulib_uint, &model->cluster);
     ulib_uint *medoids_data = uvec_data(ulib_uint, &model->medoids);
 
-    for(ulib_uint i = 0; i < model->data_count; i++) {
-        ulib_uint current_point = i;
-
+    for(ulib_uint current_point = 0; current_point < model->data_count; current_point++) {
         ulib_uint min_cluster = cluster_data[current_point];
         ulib_uint min_medoid = medoids_data[min_cluster];
         ulib_float min_cluster_dist = eai_narray_value_at(ulib_float, &model->distances, current_point, min_medoid);
 
-        for (ulib_uint j = 0; j < model->n_clusters; j++) {
-            ulib_uint new_cluster = j;
+        for (ulib_uint new_cluster = 0; new_cluster < model->n_clusters; new_cluster++) {
             ulib_uint new_medoid = medoids_data[new_cluster];
             ulib_float new_cluster_dist = eai_narray_value_at(ulib_float, &model->distances, current_point, new_medoid);
 
             if (new_cluster_dist < min_cluster_dist) {
-                cluster_data[current_point] = j;
+                cluster_data[current_point] = new_cluster;
             }
         }
     }

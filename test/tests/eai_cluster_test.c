@@ -117,7 +117,7 @@ bool test_eai_cluster_kmeans3(void)
            1, 2
     };
 
-    EaiModel model = eai_cluster_kmeans(10, 10, 2);
+    EaiModel model = eai_cluster_kmeans(10, 20, 10);
     eai_model_fit(&model, &data);
 
     UVec(ulib_uint) *clusters = eai_cluster_kmeans_clusters(&model);
@@ -152,7 +152,7 @@ bool test_eai_cluster_kmedoids1(void)
     ulib_uint expected_clusters[12] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2};
     ulib_uint errors = 0;
 
-    EaiModel model = eai_cluster_kmedoids(3, 100, 10);
+    EaiModel model = eai_cluster_kmedoids(3, 5, 10);
     eai_model_fit(&model, &data);
 
     UVec(ulib_uint) *clusters = eai_cluster_kmedoids_clusters(&model);
@@ -187,7 +187,7 @@ bool test_eai_cluster_kmedoids2(void)
 
     ulib_uint mapping[3] = { -1, -1, -1 };
 
-    EaiModel model = eai_cluster_kmedoids(3, 100, 512);
+    EaiModel model = eai_cluster_kmedoids(3, 5, 512);
     eai_model_fit(&model, &data);
 
     UVec(ulib_uint) *clusters = eai_cluster_kmedoids_clusters(&model);
@@ -236,7 +236,7 @@ bool test_eai_cluster_kmedoids3(void)
            1, 2
     };
 
-    EaiModel model = eai_cluster_kmedoids(10, 100, 50);
+    EaiModel model = eai_cluster_kmedoids(10, 5, 1);
     eai_model_fit(&model, &data);
 
     UVec(ulib_uint) *clusters = eai_cluster_kmedoids_clusters(&model);

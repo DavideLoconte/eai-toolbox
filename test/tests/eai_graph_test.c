@@ -8,7 +8,6 @@
 
 inline static bool node_eq(ulib_uint a, ulib_uint b) { return a == b; }
 
-
 EAI_GRAPH_DECL(test_graph, ulib_uint, ulib_uint)
 EAI_GRAPH_IMPL(test_graph, node_eq)
 
