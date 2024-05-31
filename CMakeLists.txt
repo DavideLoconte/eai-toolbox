@@ -11,35 +11,9 @@ set(EAI_TOOLBOX_VERSION "${EAI_TOOLBOX_VERSION_MAJOR}.${EAI_TOOLBOX_VERSION_MINO
 set(EAI_TOOLBOX_AUTHOR "Davide Loconte")
 set(EAI_TOOLBOX_COPYRIGHT_YEAR "2022-2024")
 
-option(EAI_TOOLBOX_LTO "Enable link-time optimization, if available" ON)
-
-if ( NOT CMAKE_BUILD_TYPE )
-    set( CMAKE_BUILD_TYPE DEBUG )
-endif()
+option(EAI_LTO "Enable link-time optimization, if available" ON)
 
 message( "-- Build type: ${CMAKE_BUILD_TYPE}" )
-
-include(CheckIPOSupported)
-check_ipo_supported(RESULT result)
-set(EAI_SHOULD_ENABLE_LTO FALSE)
-if (EAI_TOOLBOX_LTO)
-    if (result)
-        if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(EAI_SHOULD_ENABLE_LTO TRUE)
-        endif ()
-    endif()
-endif ()
-
-if (EAI_SHOULD_ENABLE_LTO)
-    message("-- Enabling LTO")
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-    set(ULIB_LTO ON CACHE BOOL "Enable ulib LTO")
-else ()
-    message("-- Disabling LTO")
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
-    set(ULIB_LTO OFF CACHE BOOL "Disable ulib LTO")
-endif ()
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Dependencies (ulib)
@@ -102,3 +76,12 @@ if (NOT MSVC)
     target_link_options(eai-toolbox-test-asan PRIVATE -fsanitize=address)
 endif()
 
+# IPO
+if (EAI_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT EAI_LTO_RESULT)
+    if (EAI_LTO_RESULT) 
+        message("-- LTO enabled in eai-toolbox")
+        set_property(TARGET eai-toolbox PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
+endif ()
