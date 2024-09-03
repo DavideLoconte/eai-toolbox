@@ -26,6 +26,9 @@
 #define eai_csv__CSV_H
 
 #include <ulib.h>
+#include "eai_compat.h"
+
+EAI_BEGIN_DECLS
 
 typedef enum EaiCsvReaderErrors_e {
     /// No error encountered
@@ -75,18 +78,21 @@ typedef struct EaiCsvReader_s {
  * @param crlf if true \r\n will be the line separator, else \n
  * @return A EaiCsvReader instance
  */
+EAI_PUBLIC
 EaiCsvReader eai_csv_reader(char sep, bool crlf);
 
 /**
  * @param reader the reader
  * @return the state of the reader
  */
+EAI_PUBLIC
 EaiCsvReaderError eai_csv_reader_state(EaiCsvReader *reader);
 
 /**
  * Destroy the specified reader
  * @param reader a reference to the reader
  */
+EAI_PUBLIC
 void eai_csv_reader_deinit(EaiCsvReader *reader);
 
 /**
@@ -134,6 +140,7 @@ void eai_csv_reader_deinit(EaiCsvReader *reader);
  * @param istream the input stream
  * @return a reference to the first record
  */
+EAI_PUBLIC
 UVec(UString) * eai_csv_reader_start(EaiCsvReader *r, UIStream *istream);
 
 /**
@@ -143,6 +150,7 @@ UVec(UString) * eai_csv_reader_start(EaiCsvReader *r, UIStream *istream);
  * @param r
  * @return a reference to the next record, NULL if none exists
  */
+EAI_PUBLIC
 UVec(UString) * eai_csv_reader_next(EaiCsvReader *r);
 
 /**
@@ -153,6 +161,7 @@ UVec(UString) * eai_csv_reader_next(EaiCsvReader *r);
  * @param istream the input stream
  * @return a reference to the first record
  */
+EAI_PUBLIC
 UVec(UString) * eai_csv_reader_start_record(EaiCsvReader *r, UIStream *istream);
 
 /**
@@ -164,6 +173,9 @@ UVec(UString) * eai_csv_reader_start_record(EaiCsvReader *r, UIStream *istream);
  * @param header the header pointer, required to release memory at the end of the loop
  * @return a reference to the next record, NULL if none exists
  */
+EAI_PUBLIC
 UVec(UString) * eai_csv_reader_next_record(EaiCsvReader *r, UVec(UString) * header);
+
+EAI_END_DECLS
 
 #endif // eai_csv__CSV_H

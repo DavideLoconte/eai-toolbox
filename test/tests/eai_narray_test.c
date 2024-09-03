@@ -223,6 +223,7 @@ bool eai_narray_iter_test(void)
             eai_narray_foreach(ulib_float, &iter2.item, iter3) {
                 eai_narray_foreach(ulib_float, &iter3.item, iter4) {
                     volatile ulib_float val = iter4.item.storage[0];
+                    val += 1;
                 }
             }
         }

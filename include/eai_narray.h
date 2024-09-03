@@ -27,6 +27,9 @@
 
 #include <stdarg.h>
 #include <ulib.h>
+#include "eai_compat.h"
+
+EAI_BEGIN_DECLS
 
 /**
  * Declares a new n-dimensional array type
@@ -466,5 +469,7 @@
  *       them
  */
 #define eai_narray_copy_to_uvec(type, src) eai_narray_copy_to_uvec_##type(src)
+
+EAI_END_DECLS
 
 #endif

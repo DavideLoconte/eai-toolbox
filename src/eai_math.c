@@ -22,35 +22,60 @@
  * SOFTWARE.
  */
 
-#ifndef EAI_TOOLBOX_EAI_INT_MATH_H
-#define EAI_TOOLBOX_EAI_INT_MATH_H
-
-#include <stdint.h>
 #include <ulib.h>
+#include "eai_math.h"
 
-/**
- * @param x
- * @return position of the MSB of X
- */
-ulib_uint eai_int_log2(ulib_uint x);
+// By default, assume that the platform supports math.h
+#ifndef EAI_TOOLBOX_MATH
+#define EAI_TOOLBOX_MATH 1
+#endif
 
-/**
- * @param x
- * @return 2 ^ x
- */
-ulib_uint eai_int_pow2(ulib_uint x);
+ulib_uint eai_int_log2(ulib_uint x)
+{
+    ulib_uint r = 0;
+    while(x >>= 1)
+        r++;
+    return r;
+}
 
-/**
- * @param x
- * @return log10 integer approximation of x
- */
-ulib_uint eai_int_log10(ulib_uint x);
+ulib_uint eai_int_log10(ulib_uint x)
+{
+    return (x >= 1000000000) ? 9 :
+           (x >= 100000000)  ? 8 :
+           (x >= 10000000)   ? 7 :
+           (x >= 1000000)    ? 6 :
+           (x >= 100000)     ? 5 :
+           (x >= 10000)      ? 4 :
+           (x >= 1000)       ? 3 :
+           (x >= 100)        ? 2 :
+           (x >= 10)         ? 1 :
+                               0;
+}
 
-/**
- * Round the number to the next power of 2
- * @param v the number
- * @return the next power of two
- */
-ulib_uint eai_int_next_pow2(ulib_uint v);
+ulib_uint eai_int_pow2(ulib_uint x) { return 1 << x; }
+ulib_uint eai_int_next_pow2(ulib_uint v) { return ulib_uint_ceil2(v); }
 
-#endif // EAI_TOOLBOX_EAI_INT_MATH_H
+#if EAI_TOOLBOX_MATH==1
+
+// Functions that requires math.h
+
+#include <math.h>
+
+ulib_float eai_math_sqrt(ulib_float x)
+{
+    return sqrt(x);
+}
+
+#else
+
+ulib_float eai_math_sqrt(ulib_float x)
+{
+    // Heron's method
+    ulib_float x_n = x/2;
+    for (ulib_uint i = 0; i < 10; i++) {
+        x_n = (x_n + (x / x_n)) / 2;
+    }
+    return x_n;
+}
+
+#endif

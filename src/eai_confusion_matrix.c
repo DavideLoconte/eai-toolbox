@@ -23,7 +23,7 @@
  */
 
 #include "eai_confusion_matrix.h"
-#include "eai_int_math.h"
+#include "eai_math.h"
 
 #define EAI_MAX(x, y) (x > y ? x : y)
 

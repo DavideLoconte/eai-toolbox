@@ -224,8 +224,7 @@ static void eai_kmedoids_init_ctx(EaiKMedoids *model, EaiNArray(ulib_float) *dat
     model->trained = true;
     model->data_shape = uvec_last(ulib_uint, eai_narray_shape(ulib_float, data));
     model->data_count = uvec_first(ulib_uint, eai_narray_shape(ulib_float, data));
-    srand(model->seed);
-
+    urand_set_seed(model->seed);
     model->cluster_size = uvec(ulib_uint);
     model->cluster = uvec(ulib_uint);
     model->centroids = eai_narray(ulib_float, 2, model->n_clusters, model->data_shape);
@@ -406,7 +405,7 @@ static ulib_uint eai_kmedoids_select_cluster_from_distance(UVec(ulib_float) *dis
         }
     }
 
-    ulib_uint random_choice = rand() % uvec_count(ulib_uint, bag);
+    ulib_uint random_choice = urand() % uvec_count(ulib_uint, bag);
     ulib_uint ret = uvec_get(ulib_uint, bag, random_choice);
 
     return ret;
@@ -417,7 +416,7 @@ static void eai_kmedoids_select_random_centroids(EaiKMedoids *model, EaiNArray(u
     UVec(ulib_float) distances = uvec(ulib_float);
     UVec(ulib_uint) bag = uvec(ulib_uint);
 
-    ulib_uint cluster = rand() % model->data_count;
+    ulib_uint cluster = urand() % model->data_count;
     uvec_push(ulib_uint, &model->medoids, cluster);
 
     do {

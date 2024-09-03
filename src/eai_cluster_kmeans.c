@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "eai_cluster_private.h"
 
 typedef struct EaiKMeans_s {
@@ -162,7 +160,7 @@ static void eai_kmeans_fit(void *m, EaiNArray(ulib_float) *data, ...)
     model->data_shape = uvec_last(ulib_uint, eai_narray_shape(ulib_float, data));
     model->data_count = uvec_first(ulib_uint, eai_narray_shape(ulib_float, data));
 
-    srand(model->seed);
+    urand_set_seed(model->seed);
     eai_kmeans_init_clustering(model);
     eai_kmeans_select_random_centroids(model, data);
     eai_kmeans_assign_clusters(model, data);
@@ -223,7 +221,7 @@ static ulib_uint eai_kmeans_select_cluster_from_distance(UVec(ulib_float) *dista
         }
     }
 
-    ulib_uint random_choice = rand() % uvec_count(ulib_uint, bag);
+    ulib_uint random_choice = urand() % uvec_count(ulib_uint, bag);
     ulib_uint ret = uvec_get(ulib_uint, bag, random_choice);
 
     return ret;
@@ -235,7 +233,7 @@ static void eai_kmeans_select_random_centroids(EaiKMeans *model, EaiNArray(ulib_
     UVec(ulib_float) distances = uvec(ulib_float);
     UVec(ulib_uint) bag = uvec(ulib_uint);
 
-    ulib_uint cluster = rand() % model->data_count;
+    ulib_uint cluster = urand() % model->data_count;
     uvec_push(ulib_uint, &clusters, cluster);
 
     do {
@@ -329,7 +327,7 @@ static void eai_kmeans_reassign_empty_clusters(EaiKMeans *model, EaiNArray(ulib_
             continue;
         }
 
-        ulib_uint random_point = rand() % model->data_count;
+        ulib_uint random_point = urand() % model->data_count;
         EaiNArray(ulib_float) centroid = eai_narray_get(ulib_float, &model->centroids, i);
         EaiNArray(ulib_float) new_centroid = eai_narray_get(ulib_float, data, random_point);
         eai_narray_copy(ulib_float, &centroid, &new_centroid);

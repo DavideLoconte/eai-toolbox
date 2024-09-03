@@ -26,6 +26,9 @@
 #define EAI_TOOLBOX_EAI_PROFILE_H
 
 #include <ulib.h>
+#include "eai_compat.h"
+
+EAI_BEGIN_DECLS
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -33,17 +36,22 @@
 /**
  * @return the wall clock in seconds
  */
+EAI_PUBLIC
 ulib_float eai_profile_get_wall_clock(void);
 
 /**
  * @return the resident set size of current process
  */
+EAI_PUBLIC
 ulib_uint eai_profile_get_resident_memory(void);
 
 /**
  * Sleep for the specified number of seconds
  * @param seconds
  */
+EAI_PUBLIC
 void eai_profile_sleep(ulib_uint seconds);
+
+EAI_END_DECLS
 
 #endif // EAI_TOOLBOX_EAI_PROFILE_H

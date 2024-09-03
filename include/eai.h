@@ -1,4 +1,3 @@
- 
 /*
  * MIT License
  *
@@ -23,18 +22,17 @@
  * SOFTWARE.
  */
 
-#ifndef EAI_TOOLBOX_NARRAY_BUILTIN_H
-#define EAI_TOOLBOX_NARRAY_BUILTIN_H
+#ifndef EAI_H__
+#define EAI_H__
 
+#include "eai_cluster.h"
+#include "eai_confusion_matrix.h"
+#include "eai_csv_reader.h"
+#include "eai_graph.h"
+#include "eai_math.h"
+#include "eai_narray_builtin.h"
 #include "eai_narray.h"
-#include "eai_compat.h"
-
-EAI_BEGIN_DECLS
-
-EAI_NARRAY_DECL(ulib_uint)
-EAI_NARRAY_DECL(ulib_int)
-EAI_NARRAY_DECL(ulib_float)
-
-EAI_END_DECLS
+#include "eai_profile.h"
+#include "eai_regression_metrics.h"
 
 #endif

@@ -26,6 +26,9 @@
 #define EAI_TOOLBOX_EAI_REGRESSION_METRICS_H
 
 #include <ulib.h>
+#include "eai_compat.h"
+
+EAI_BEGIN_DECLS
 
 typedef struct EaiRegressionMetrics_s {
     ulib_float mse;
@@ -39,6 +42,7 @@ typedef struct EaiRegressionMetrics_s {
  * Init a EaiRegressionMetrics structure for evaluating regression tasks
  * @return the EaiRegressionMetrics structure
  */
+EAI_PUBLIC
 EaiRegressionMetrics eai_regression_metrics(void);
 
 /**
@@ -47,6 +51,7 @@ EaiRegressionMetrics eai_regression_metrics(void);
  * @param actual the real value
  * @param predicted the predicted value
  */
+EAI_PUBLIC
 void eai_regression_metrics_add(EaiRegressionMetrics *metrics,
                                 ulib_float actual,
                                 ulib_float predicted);
@@ -55,36 +60,44 @@ void eai_regression_metrics_add(EaiRegressionMetrics *metrics,
  * @param metrics EaiRegressionMetrics instance
  * @return the Mean Squared Error
  */
+EAI_PUBLIC
 ulib_float eai_regression_metrics_mse(EaiRegressionMetrics *metrics);
 
 /**
  * @param metrics EaiRegressionMetrics instance
  * @return the Root Mean Squared Error
  */
+EAI_PUBLIC
 ulib_float eai_regression_metrics_rmse(EaiRegressionMetrics *metrics);
 
 /**
  * @param metrics EaiRegressionMetrics instance
  * @return the mean absolute error
  */
+EAI_PUBLIC
 ulib_float eai_regression_metrics_mae(EaiRegressionMetrics *metrics);
 
 /**
  * @param metrics EaiRegressionMetrics instance
  * @return the maximum absolute error
  */
+EAI_PUBLIC
 ulib_float eai_regression_metrics_max_error(EaiRegressionMetrics *metrics);
 
 /**
  * @param metrics EaiRegressionMetrics instance
  * @return the minimum absolute error
  */
+EAI_PUBLIC
 ulib_float eai_regression_metrics_min_error(EaiRegressionMetrics *metrics);
 
 /**
  * @param metrics EaiRegressionMetrics instance
  * @return the number of samples inserted into metrics
  */
+EAI_PUBLIC
 ulib_float eai_regression_metrics_count(EaiRegressionMetrics *metrics);
+
+EAI_END_DECLS
 
 #endif // EAI_TOOLBOX_EAI_REGRESSION_METRICS_H

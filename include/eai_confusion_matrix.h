@@ -26,6 +26,9 @@
 #define EAI_TOOLBOX_EAI_CONFUSION_MATRIX_H
 
 #include <ulib.h>
+#include "eai_compat.h"
+
+EAI_BEGIN_DECLS
 
 #define EAI_CONFUSION_MATRIX_VEC_ERR ubit_bit(8, 0)
 #define EAI_CONFUSION_MATRIX_ERR ubit_bit(8, 1)
@@ -43,12 +46,14 @@ typedef struct EaiConfusionMatrix_s {
  * Instantiate a confusion matrix
  * @return a confusion matrix instance
  */
+EAI_PUBLIC
 EaiConfusionMatrix eai_confusion_matrix(void);
 
 /**
  * Destroy a confusion matrix and release allocated memory
  * @param matrix the confusion matrix
  */
+EAI_PUBLIC
 void eai_confusion_matrix_deinit(EaiConfusionMatrix *matrix);
 
 /**
@@ -57,6 +62,7 @@ void eai_confusion_matrix_deinit(EaiConfusionMatrix *matrix);
  * @param actual the actual class
  * @param predicted the predicted class
  */
+EAI_PUBLIC
 void eai_confusion_matrix_add(EaiConfusionMatrix *matrix, ulib_uint actual, ulib_uint predicted);
 
 /**
@@ -65,6 +71,7 @@ void eai_confusion_matrix_add(EaiConfusionMatrix *matrix, ulib_uint actual, ulib
  * @param actual the actual class
  * @param predicted the predicted one
  */
+EAI_PUBLIC
 void eai_confusion_matrix_del(EaiConfusionMatrix *matrix, ulib_uint actual, ulib_uint predicted);
 
 /**
@@ -73,6 +80,7 @@ void eai_confusion_matrix_del(EaiConfusionMatrix *matrix, ulib_uint actual, ulib
  * @param actual the actual class
  * @param predicted the predicted one
  */
+EAI_PUBLIC
 ulib_uint eai_confusion_matrix_get(EaiConfusionMatrix *matrix,
                                    ulib_uint actual,
                                    ulib_uint predicted);
@@ -82,6 +90,7 @@ ulib_uint eai_confusion_matrix_get(EaiConfusionMatrix *matrix,
  * @param matrix the confusion matrix
  * @return the accuracy of the confusion matrix
  */
+EAI_PUBLIC
 ulib_float eai_confusion_matrix_get_accuracy(EaiConfusionMatrix *matrix);
 
 /**
@@ -91,6 +100,7 @@ ulib_float eai_confusion_matrix_get_accuracy(EaiConfusionMatrix *matrix);
  *                  tasks, this value should represent the positive outcome
  * @return the precision
  */
+EAI_PUBLIC
 ulib_float eai_confusion_matrix_get_precision(EaiConfusionMatrix *matrix, ulib_uint predicted);
 
 /**
@@ -100,6 +110,7 @@ ulib_float eai_confusion_matrix_get_precision(EaiConfusionMatrix *matrix, ulib_u
  *                  tasks, this value should represent the positive outcome
  * @return the recall
  */
+EAI_PUBLIC
 ulib_float eai_confusion_matrix_get_recall(EaiConfusionMatrix *matrix, ulib_uint predicted);
 
 /**
@@ -111,6 +122,7 @@ ulib_float eai_confusion_matrix_get_recall(EaiConfusionMatrix *matrix, ulib_uint
  * precision term
  * @return the f1 score
  */
+EAI_PUBLIC
 ulib_float eai_confusion_matrix_get_fb_score(EaiConfusionMatrix *matrix,
                                              ulib_uint predicted,
                                              ulib_float beta);
@@ -120,6 +132,7 @@ ulib_float eai_confusion_matrix_get_fb_score(EaiConfusionMatrix *matrix,
  * @param matrix the confusion matrix
  * @return mean precision
  */
+EAI_PUBLIC
 ulib_float eai_confusion_matrix_get_mean_precision(EaiConfusionMatrix *matrix);
 
 /**
@@ -127,6 +140,7 @@ ulib_float eai_confusion_matrix_get_mean_precision(EaiConfusionMatrix *matrix);
  * @param matrix the confusion matrix
  * @return mean recall
  */
+EAI_PUBLIC
 ulib_float eai_confusion_matrix_get_mean_recall(EaiConfusionMatrix *matrix);
 
 /**
@@ -136,6 +150,7 @@ ulib_float eai_confusion_matrix_get_mean_recall(EaiConfusionMatrix *matrix);
  * precision term
  * @return mean f1 score
  */
+EAI_PUBLIC
 ulib_float eai_confusion_matrix_get_mean_fb_score(EaiConfusionMatrix *matrix, ulib_float beta);
 
 /**
@@ -145,6 +160,7 @@ ulib_float eai_confusion_matrix_get_mean_fb_score(EaiConfusionMatrix *matrix, ul
  *                user is responsible of allocating and deallocating it
  * @return a UString formatted for logging confusion matrix. User is responsible of deallocating it
  */
+EAI_PUBLIC
 UString eai_confusion_matrix_to_string(EaiConfusionMatrix *matrix, UVec(UString) * symbols);
 
 /**
@@ -155,6 +171,9 @@ UString eai_confusion_matrix_to_string(EaiConfusionMatrix *matrix, UVec(UString)
  * @return a UString formatted for logging confusion matrix metrics. User is responsible of
  * deallocating it
  */
+EAI_PUBLIC
 UString eai_confusion_matrix_metrics_to_string(EaiConfusionMatrix *matrix, UVec(UString) * symbols);
+
+EAI_END_DECLS
 
 #endif // EAI_TOOLBOX_EAI_CONFUSION_MATRIX_H

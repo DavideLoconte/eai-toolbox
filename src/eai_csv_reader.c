@@ -22,9 +22,6 @@
  * SOFTWARE.
  */
 
-#include "ustring.h"
-#include <assert.h>
-
 #include <ulib.h>
 
 #include "eai_csv_reader.h"
@@ -312,7 +309,6 @@ static void eai_csv_escape_sequence(EaiCsvReader *r)
 
 static void eai_csv_reader_fill_buffer(EaiCsvReader *r, size_t from)
 {
-    assert(from < r->_bufsize);
     if(ubit_is_set(8, r->_flags, END_REACHED)) {
         r->_buf[from] = EAI_CSV_NULL_TERMINATOR;
         r->_bufsize = from + 1;

@@ -1,10 +1,10 @@
+#include <ulib.h>
 #include "eai_cluster_private.h"
-#include "ustrbuf.h"
-#include "uvec_builtin.h"
+#include "eai_math.h"
 
 ulib_float eai_distance(EaiNArray(ulib_float)* a, EaiNArray(ulib_float)* b, ulib_uint shape)
 {
-    return sqrt(eai_squared_distance(a, b, shape));
+    return eai_math_sqrt(eai_squared_distance(a, b, shape));
 }
 
 ulib_float eai_squared_distance(EaiNArray(ulib_float)* a, EaiNArray(ulib_float)* b, ulib_uint shape)

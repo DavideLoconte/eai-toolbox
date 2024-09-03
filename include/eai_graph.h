@@ -26,6 +26,9 @@
 #define EAI_TOOLBOX_EAI_GRAPH_H
 
 #include <ulib.h>
+#include "eai_compat.h"
+
+EAI_BEGIN_DECLS
 
 #define EAI_GRAPH_MEM_ERROR ubit_bit(8, 1)
 #define EAI_GRAPH_NOT_FOUND ubit_bit(8, 2)
@@ -694,5 +697,7 @@
  * @param true if the next edge exists
  */
 #define p_eai_graph_has_next(T, loop) p_eai_graph_has_next_##T(loop)
+
+EAI_END_DECLS
 
 #endif // EAI_TOOLBOX_EAI_GRAPH_H

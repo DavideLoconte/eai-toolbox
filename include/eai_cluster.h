@@ -26,6 +26,9 @@
 #define EAI_TOOLBOX_EAI_CLUSTER_H
 
 #include "eai_model.h"
+#include "eai_compat.h"
+
+EAI_BEGIN_DECLS
 
 /**
  * @param n_cluster the number of clusters
@@ -33,6 +36,7 @@
  * @param seed seed for RNG
  * @return EaiModel for KMeans
  */
+EAI_PUBLIC
 EaiModel eai_cluster_kmeans(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint seed);
 
 /**
@@ -42,6 +46,7 @@ EaiModel eai_cluster_kmeans(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint s
  * @note null is returned if model is not trained
  * @note the returned vector has the same lifetime as EaiModel and should not manually de-inited
  */
+EAI_PUBLIC
 UVec(ulib_uint) *eai_cluster_kmeans_clusters(EaiModel *model);
 
 /**
@@ -50,6 +55,7 @@ UVec(ulib_uint) *eai_cluster_kmeans_clusters(EaiModel *model);
  * @note null is returned if model is not trained
  * @note the returned narray has the same lifetime as EaiModel and should not manually de-inited
  */
+EAI_PUBLIC
 EaiNArray(ulib_float) *eai_cluster_kmeans_centroids(EaiModel *model);
 
 /**
@@ -58,6 +64,7 @@ EaiNArray(ulib_float) *eai_cluster_kmeans_centroids(EaiModel *model);
  * @param seed seed for RNG
  * @return EaiModel for KMedoids
  */
+EAI_PUBLIC
 EaiModel eai_cluster_kmedoids(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint seed);
 
 /**
@@ -67,6 +74,7 @@ EaiModel eai_cluster_kmedoids(ulib_uint n_cluster, ulib_uint max_iter, ulib_uint
  * @note null is returned if model is not trained
  * @note the returned vector has the same lifetime as EaiModel and should not manually de-inited
  */
+EAI_PUBLIC
 UVec(ulib_uint) *eai_cluster_kmedoids_clusters(EaiModel *model);
 
 /**
@@ -75,6 +83,7 @@ UVec(ulib_uint) *eai_cluster_kmedoids_clusters(EaiModel *model);
  * @note null is returned if model is not trained
  * @note the returned narray has the same lifetime as EaiModel and should not manually de-inited
  */
+EAI_PUBLIC
 EaiNArray(ulib_float) *eai_cluster_kmedoids_centroids(EaiModel *model);
 
 /**
@@ -83,6 +92,9 @@ EaiNArray(ulib_float) *eai_cluster_kmedoids_centroids(EaiModel *model);
  * @note null is returned if model is not trained
  * @note the returned narray has the same lifetime as EaiModel and should not manually de-inited
  */
+EAI_PUBLIC
 UVec(ulib_uint) *eai_cluster_kmedoids_medoids(EaiModel *model);
+
+EAI_END_DECLS
 
 #endif

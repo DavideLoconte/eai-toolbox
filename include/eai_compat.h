@@ -1,4 +1,3 @@
- 
 /*
  * MIT License
  *
@@ -23,18 +22,21 @@
  * SOFTWARE.
  */
 
-#ifndef EAI_TOOLBOX_NARRAY_BUILTIN_H
-#define EAI_TOOLBOX_NARRAY_BUILTIN_H
+#ifndef EAI_COMPAT__H_
+#define EAI_COMPAT__H_
 
-#include "eai_narray.h"
-#include "eai_compat.h"
+#ifdef __cplusplus
+    #define EAI_BEGIN_DECLS extern "C" {
+    #define EAI_END_DECLS }
+#else
+    #define EAI_BEGIN_DECLS
+    #define EAI_END_DECLS 
+#endif
 
-EAI_BEGIN_DECLS
+#define EAI_INLINE inline
+#define EAI_STATIC static
 
-EAI_NARRAY_DECL(ulib_uint)
-EAI_NARRAY_DECL(ulib_int)
-EAI_NARRAY_DECL(ulib_float)
-
-EAI_END_DECLS
+#define EAI_PUBLIC
+#define EAI_PRIVATE EAI_STATIC
 
 #endif

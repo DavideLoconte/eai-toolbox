@@ -3,7 +3,7 @@
 //
 
 #include "eai_math_test.h"
-#include "eai_int_math.h"
+#include "eai_math.h"
 
 bool eai_math_test_int_log2(void)
 {
@@ -46,5 +46,23 @@ bool eai_math_test_int_next_pow2(void)
     utest_assert_int(eai_int_next_pow2(42), ==, 64);
     utest_assert_int(eai_int_next_pow2(69), ==, 128);
     utest_assert_int(eai_int_next_pow2(65355), ==, 65536);
+    return true;
+}
+
+bool eai_math_test_float_sqrt(void)
+{
+    const ulib_float tol = 0.001;
+    utest_assert_float(eai_math_sqrt(4), <=, 2 + tol);
+    utest_assert_float(eai_math_sqrt(4), >=, 2 - tol);
+
+    utest_assert_float(eai_math_sqrt(10), <=, 3.1622776602 + tol);
+    utest_assert_float(eai_math_sqrt(10), >=, 3.1622776602 - tol);
+
+    utest_assert_float(eai_math_sqrt(69), <=, 8.3066238629 + tol);
+    utest_assert_float(eai_math_sqrt(69), >=, 8.3066238629 - tol);
+
+    utest_assert_float(eai_math_sqrt(420), <=, 20.4939015319 + tol);
+    utest_assert_float(eai_math_sqrt(420), >=, 20.4939015319 - tol);
+
     return true;
 }
