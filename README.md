@@ -9,7 +9,7 @@ This repository contains a lightweight C library that provides various utilities
 - Regression accuracy metrics: Calculate accuracy metrics for regression models.
 - Directed Acyclic Graph (DAG) implementation: Implement and manipulate DAG structures for various applications.
 - Generic N-dimensional array. 
-- Scikit-Learn :wlike interface for machine learning algorithms, with two clustering algorithms implementation (KMeans and KMedoids)
+- Scikit-Learn like interface for machine learning algorithms, with two clustering algorithms implementation (KMeans and KMedoids)
 
 ## Future Work
 
