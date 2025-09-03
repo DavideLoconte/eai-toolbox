@@ -31,26 +31,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Dependencies (ulib)
 if (NOT TARGET ulib)
-
-    if (EAI_TOOLBOX_LTO_ENABLED)
-        set(ULIB_LTO ON CACHE BOOL "" FORCE)
-    endif()
-
-    include(FetchContent)
-    message("-- Fetching ulib for eai-toolbox")
-    FetchContent_Declare(
-            ulib
-            GIT_REPOSITORY https://github.com/IvanoBilenchi/ulib.git
-            GIT_TAG c89c7b8e356bbedff78a08ef0da27275cffcce35
-    )
-    FetchContent_MakeAvailable(ulib)
-    set(ULIB_HEADERS_DIR ${ULIB_PUBLIC_HEADERS_DIR})
-
+    option(ULIB_LTO "" ${EAI_TOOLBOX_LTO_ENABLED})
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/lib/ulib" EXCLUDE_FROM_ALL)
 endif()
 
 # eai-toolbox
 set(EAI_TOOLBOX_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
-set(EAI_TOOLBOX_HEADERS_DIR "${CMAKE_CURRENT_LIST_DIR}/include" ${ULIB_HEADERS_DIR})
+set(EAI_TOOLBOX_HEADERS_DIR "${CMAKE_CURRENT_LIST_DIR}/include")
 set(EAI_TOOLBOX_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/test")
 
 # sources
