@@ -14,14 +14,13 @@ EAI_GRAPH_IMPL(test_graph, node_eq)
 EAI_GRAPH_DECL(test_graph2, ulib_uint, ulib_float)
 EAI_GRAPH_IMPL(test_graph2, node_eq)
 
-bool eai_graph_test_1(void)
+void eai_graph_test_1(void)
 {
     EaiGraph(test_graph) graph = eai_graph(test_graph);
     eai_graph_deinit(test_graph, &graph);
-    return true;
 }
 
-bool eai_graph_test_2(void)
+void eai_graph_test_2(void)
 {
     EaiGraph(test_graph) graph = eai_graph(test_graph);
 
@@ -48,10 +47,10 @@ bool eai_graph_test_2(void)
     utest_assert(!eai_graph_has_edge(test_graph, &graph, 4, 2));
     utest_assert(!eai_graph_has_edge(test_graph, &graph, 2, 4));
     eai_graph_deinit(test_graph, &graph);
-    return true;
+     
 }
 
-bool eai_graph_test_3(void)
+void eai_graph_test_3(void)
 {
     EaiGraph(test_graph) graph = eai_graph(test_graph);
 
@@ -109,10 +108,9 @@ bool eai_graph_test_3(void)
     utest_assert(ubit_is_set(8, graph.flags, EAI_GRAPH_NOT_FOUND));
 
     eai_graph_deinit(test_graph, &graph);
-    return true;
 }
 
-bool eai_graph_test_4(void)
+void eai_graph_test_4(void)
 {
     EaiGraph(test_graph2) graph = eai_graph(test_graph2);
 
@@ -171,5 +169,4 @@ bool eai_graph_test_4(void)
     utest_assert_uint(count, ==, 1);
 
     eai_graph_deinit(test_graph2, &graph);
-    return true;
 }

@@ -7,13 +7,13 @@
 
 #include <ulib.h>
 
-bool test_eai_cluster_kmeans1(void);
-bool test_eai_cluster_kmeans2(void);
-bool test_eai_cluster_kmeans3(void);
+void test_eai_cluster_kmeans1(void);
+void test_eai_cluster_kmeans2(void);
+void test_eai_cluster_kmeans3(void);
 
-bool test_eai_cluster_kmedoids1(void);
-bool test_eai_cluster_kmedoids2(void);
-bool test_eai_cluster_kmedoids3(void);
+void test_eai_cluster_kmedoids1(void);
+void test_eai_cluster_kmedoids2(void);
+void test_eai_cluster_kmedoids3(void);
 
 #define EAI_KMEANS_TESTS test_eai_cluster_kmeans1, test_eai_cluster_kmeans2, test_eai_cluster_kmeans3
 #define EAI_KMEDOIDS_TESTS test_eai_cluster_kmedoids1, test_eai_cluster_kmedoids2, test_eai_cluster_kmedoids3

@@ -7,7 +7,7 @@
 #include <eai_csv_reader.h>
 #include <ulib.h>
 
-bool test_eai_csv_reader1(void)
+void test_eai_csv_reader1(void)
 {
     const char *eai_csv_reader_test_str =
         "test, \"test2\", \"a\"test 3\"b\"\n"
@@ -81,10 +81,9 @@ bool test_eai_csv_reader1(void)
     utest_assert(eai_csv_reader_state(&reader) == EAI_CSV_READER_OK);
     eai_csv_reader_deinit(&reader);
     uistream_deinit(&csv_stream);
-    return true;
 }
 
-bool test_eai_csv_reader2(void)
+void test_eai_csv_reader2(void)
 {
     const char *eai_csv_reader_test_str =
         "1\t2\t3\t4\t\n"
@@ -148,10 +147,9 @@ bool test_eai_csv_reader2(void)
     utest_assert(eai_csv_reader_state(&reader) == EAI_CSV_READER_OK);
     eai_csv_reader_deinit(&reader);
     uistream_deinit(&csv_stream);
-    return true;
 }
 
-bool test_eai_csv_reader3(void)
+void test_eai_csv_reader3(void)
 {
     const char *eai_csv_reader_test_str =
         ",2,3,4,\n"
@@ -219,10 +217,9 @@ bool test_eai_csv_reader3(void)
     utest_assert(eai_csv_reader_state(&reader) == EAI_CSV_READER_OK);
     eai_csv_reader_deinit(&reader);
     uistream_deinit(&csv_stream);
-    return true;
 }
 
-bool test_eai_csv_reader_multiple(void)
+void test_eai_csv_reader_multiple(void)
 {
     srand((unsigned int) time(NULL));
     const char *eai_csv_reader_test_str_0 =
@@ -337,10 +334,9 @@ bool test_eai_csv_reader_multiple(void)
     utest_assert(eai_csv_reader_state(&reader) == EAI_CSV_READER_OK);
     eai_csv_reader_deinit(&reader);
     uistream_deinit(&csv_stream);
-    return true;
 }
 
-bool test_eai_csv_reader_errors(void)
+void test_eai_csv_reader_errors(void)
 {
     // Stream error
     UIStream csv_stream;
@@ -350,17 +346,16 @@ bool test_eai_csv_reader_errors(void)
     // No CRLF
     EaiCsvReader reader = eai_csv_reader(',', false);
     eai_csv_reader_foreach_record(&reader, &csv_stream, record) {
-        return false;
+        utest_assert(0);
     }
     EaiCsvReaderError state = eai_csv_reader_state(&reader);
     utest_assert(state == EAI_CSV_READER_PARSING_ERROR);
 
     uistream_deinit(&csv_stream);
     eai_csv_reader_deinit(&reader);
-    return true;
 }
 
-bool test_eai_csv_reader_header(void)
+void test_eai_csv_reader_header(void)
 {
     const char *eai_csv_reader_test_str =
         "test, \"test2\", \"a\"test 3\"b\"\n"
@@ -454,5 +449,4 @@ bool test_eai_csv_reader_header(void)
     utest_assert(eai_csv_reader_state(&reader) == EAI_CSV_READER_OK);
     eai_csv_reader_deinit(&reader);
     uistream_deinit(&csv_stream);
-    return true;
 }

@@ -25,7 +25,7 @@ static void teardown_data(EaiNArray(ulib_float) *data);
 
 // Public impl =================================================================
 
-bool test_eai_cluster_kmeans1(void)
+void test_eai_cluster_kmeans1(void)
 {
     EaiNArray(ulib_float) data = setup_data_1();
     const ulib_float expected_centroids[3][2] = { { 1, 1 }, { 7, 1 }, { 4, 7 } };
@@ -57,10 +57,9 @@ bool test_eai_cluster_kmeans1(void)
     utest_assert_uint(found[2], ==, 1);
     teardown_data(&data);
     eai_model_deinit(&model);
-    return true;
 }
 
-bool test_eai_cluster_kmeans2(void)
+void test_eai_cluster_kmeans2(void)
 {
     EaiNArray(ulib_float) data = setup_data_2();
     const ulib_uint expected_clusters[30] = { 1, 0, 2, 2, 1, 0, 0, 2, 0, 2, 2, 2, 1, 2, 0,
@@ -94,11 +93,9 @@ bool test_eai_cluster_kmeans2(void)
     utest_assert_uint(errors, ==, 0);
     teardown_data(&data);
     eai_model_deinit(&model);
-
-    return true;
 }
 
-bool test_eai_cluster_kmeans3(void)
+void test_eai_cluster_kmeans3(void)
 {
     EaiNArray(ulib_float) data = setup_data_3();
 
@@ -141,11 +138,9 @@ bool test_eai_cluster_kmeans3(void)
     utest_assert_uint(errors, <=, 5);
     teardown_data(&data);
     eai_model_deinit(&model);
-
-    return true;
 }
 
-bool test_eai_cluster_kmedoids1(void)
+void test_eai_cluster_kmedoids1(void)
 {
     EaiNArray(ulib_float) data = setup_data_1();
     ulib_uint mapping[3] = { -1, -1, -1, };
@@ -176,10 +171,9 @@ bool test_eai_cluster_kmedoids1(void)
     utest_assert_uint(errors, ==, 0);
     teardown_data(&data);
     eai_model_deinit(&model);
-    return true;
 }
 
-bool test_eai_cluster_kmedoids2(void)
+void test_eai_cluster_kmedoids2(void)
 {
     EaiNArray(ulib_float) data = setup_data_2();
     const ulib_uint expected_clusters[30] = { 1, 0, 2, 2, 1, 0, 0, 2, 0, 2, 2, 2, 1, 2, 0,
@@ -213,11 +207,9 @@ bool test_eai_cluster_kmedoids2(void)
     utest_assert_uint(errors, ==, 0);
     teardown_data(&data);
     eai_model_deinit(&model);
-
-    return true;
 }
 
-bool test_eai_cluster_kmedoids3(void)
+void test_eai_cluster_kmedoids3(void)
 {
     EaiNArray(ulib_float) data = setup_data_3();
 
@@ -261,7 +253,7 @@ bool test_eai_cluster_kmedoids3(void)
     teardown_data(&data);
     eai_model_deinit(&model);
 
-    return true;
+     
 }
 
 // Private impl ================================================================

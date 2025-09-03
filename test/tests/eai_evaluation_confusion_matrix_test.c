@@ -3,7 +3,7 @@
 //
 #include <eai_confusion_matrix.h>
 
-bool test_eai_confusion_matrix_scores_accuracy_1(void)
+void test_eai_confusion_matrix_scores_accuracy_1(void)
 {
     UVec(UString) symbols = uvec(UString);
     uvec_push(UString, &symbols, ustring_literal("Positive"));
@@ -67,10 +67,9 @@ bool test_eai_confusion_matrix_scores_accuracy_1(void)
 
     uvec_deinit(UString, &symbols);
     eai_confusion_matrix_deinit(&confusion_matrix);
-    return true;
 }
 
-bool test_eai_confusion_matrix_scores_accuracy_05(void)
+void test_eai_confusion_matrix_scores_accuracy_05(void)
 {
     UVec(UString) symbols = uvec(UString);
     uvec_push(UString, &symbols, ustring_literal("High"));
@@ -165,10 +164,9 @@ bool test_eai_confusion_matrix_scores_accuracy_05(void)
 
     uvec_deinit(UString, &symbols);
     eai_confusion_matrix_deinit(&confusion_matrix);
-    return true;
 }
 
-bool test_eai_confusion_matrix_scores_errors(void)
+void test_eai_confusion_matrix_scores_errors(void)
 {
     EaiConfusionMatrix confusion_matrix = eai_confusion_matrix();
     for(ulib_uint i = 0; i < 100; i++) {
@@ -180,5 +178,4 @@ bool test_eai_confusion_matrix_scores_errors(void)
     utest_assert_uint((ulib_uint) i, ==, (ulib_uint) -1);
     utest_assert(confusion_matrix.flags & EAI_CONFUSION_MATRIX_NOT_FOUND_ERR);
     eai_confusion_matrix_deinit(&confusion_matrix);
-    return true;
 }

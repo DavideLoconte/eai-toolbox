@@ -244,8 +244,8 @@ static void eai_csv_reader_reset(EaiCsvReader *r)
     if(r->_buf == NULL)
         r->_flags = ubit_set(8, r->_flags, EAI_CSV_READER_MEM_ERROR);
     r->_bufpos = 0;
-    r->_lastsep = -1;
-    r->i = -1;
+    r->_lastsep = (ulib_uint) -1;
+    r->i = (ulib_uint) -1;
 }
 
 static UVec(UString) * eai_csv_reader_emit_record(EaiCsvReader *r)
@@ -311,7 +311,7 @@ static void eai_csv_reader_fill_buffer(EaiCsvReader *r, size_t from)
 {
     if(ubit_is_set(8, r->_flags, END_REACHED)) {
         r->_buf[from] = EAI_CSV_NULL_TERMINATOR;
-        r->_bufsize = from + 1;
+        r->_bufsize = (ulib_uint) from + 1;
         return;
     }
 
@@ -325,7 +325,7 @@ static void eai_csv_reader_fill_buffer(EaiCsvReader *r, size_t from)
 
     if(read < count) {
         r->_flags = ubit_set(8, r->_flags, END_REACHED);
-        r->_bufsize = from + read + 1;
+        r->_bufsize = (ulib_uint) from + read + 1;
     }
 
     r->_buf[r->_bufsize - 1] = EAI_CSV_NULL_TERMINATOR;
@@ -370,7 +370,7 @@ static void eai_csv_reader_rotate(EaiCsvReader *r)
     memmove(r->_buf, r->_buf + r->_bufpos, count);
     eai_csv_reader_fill_buffer(r, (r->_bufsize - (r->_bufpos + 1)));
     r->_bufpos = 0;
-    r->_lastsep = -1;
+    r->_lastsep = (ulib_uint) -1;
 }
 
 static void eai_csv_emit_field(EaiCsvReader *r)

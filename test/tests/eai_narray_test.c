@@ -1,7 +1,7 @@
 #include <eai_narray.h>
 #include <eai_narray_builtin.h>
 
-bool eai_narray_base_test(void)
+void eai_narray_base_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
@@ -14,10 +14,9 @@ bool eai_narray_base_test(void)
 
     eai_narray_deinit(ulib_float, &array);
     eai_narray_deinit(ulib_uint, &array2);
-    return true;
 }
 
-bool eai_narray_get_test(void)
+void eai_narray_get_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
@@ -42,11 +41,9 @@ bool eai_narray_get_test(void)
 
     eai_narray_deinit(ulib_float, &array);
     eai_narray_deinit(ulib_uint, &array2);
-
-    return true;
 }
 
-bool eai_narray_shape_test(void)
+void eai_narray_shape_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 1, 2, 3);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 5, 1, 2, 3, 4, 5);
@@ -66,10 +63,10 @@ bool eai_narray_shape_test(void)
 
     eai_narray_deinit(ulib_float, &array);
     eai_narray_deinit(ulib_uint, &array2);
-    return true;
+
 }
 
-bool eai_narray_set_test(void)
+void eai_narray_set_test(void)
 {
     UVec(ulib_uint) shape = uvec(ulib_uint);
     uvec_push(ulib_uint, &shape, 3);
@@ -152,10 +149,10 @@ bool eai_narray_set_test(void)
 
     eai_narray_deinit(ulib_float, &array);
     eai_narray_deinit(ulib_uint, &array2);
-    return true;
+
 }
 
-bool eai_narray_get_ref_test(void)
+void eai_narray_get_ref_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 3, 3, 3);
     EaiNArray(ulib_uint) array2 = eai_narray(ulib_uint, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
@@ -202,10 +199,9 @@ bool eai_narray_get_ref_test(void)
 
     eai_narray_deinit(ulib_float, &array);
     eai_narray_deinit(ulib_uint, &array2);
-    return true;
 }
 
-bool eai_narray_iter_test(void)
+void eai_narray_iter_test(void)
 {
     EaiNArray(ulib_float) array = eai_narray(ulib_float, 3, 2, 3, 4);
 
@@ -230,5 +226,4 @@ bool eai_narray_iter_test(void)
     }
 
     eai_narray_deinit(ulib_float, &array);
-    return true;
 }

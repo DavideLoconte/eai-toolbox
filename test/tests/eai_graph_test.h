@@ -7,10 +7,10 @@
 
 #include <ulib.h>
 
-bool eai_graph_test_1(void);
-bool eai_graph_test_2(void);
-bool eai_graph_test_3(void);
-bool eai_graph_test_4(void);
+void eai_graph_test_1(void);
+void eai_graph_test_2(void);
+void eai_graph_test_3(void);
+void eai_graph_test_4(void);
 
 #define EAI_GRAPH_TESTS eai_graph_test_1, eai_graph_test_2, eai_graph_test_3, eai_graph_test_4
 

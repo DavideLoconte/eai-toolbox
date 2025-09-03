@@ -7,9 +7,9 @@
 
 #include <ulib.h>
 
-bool test_eai_confusion_matrix_scores_accuracy_1(void);
-bool test_eai_confusion_matrix_scores_accuracy_05(void);
-bool test_eai_confusion_matrix_scores_errors(void);
+void test_eai_confusion_matrix_scores_accuracy_1(void);
+void test_eai_confusion_matrix_scores_accuracy_05(void);
+void test_eai_confusion_matrix_scores_errors(void);
 
 #define EAI_CONFUSION_MATRIX_TESTS                                                                 \
     test_eai_confusion_matrix_scores_accuracy_1, test_eai_confusion_matrix_scores_accuracy_05,     \

@@ -3,12 +3,12 @@
 
 #include <ulib.h>
 
-bool eai_narray_base_test(void);
-bool eai_narray_set_test(void);
-bool eai_narray_get_test(void);
-bool eai_narray_get_ref_test(void);
-bool eai_narray_shape_test(void);
-bool eai_narray_iter_test(void);
+void eai_narray_base_test(void);
+void eai_narray_set_test(void);
+void eai_narray_get_test(void);
+void eai_narray_get_ref_test(void);
+void eai_narray_shape_test(void);
+void eai_narray_iter_test(void);
 
 #define EAI_NARRAY_TESTS                                                                           \
     eai_narray_base_test, eai_narray_set_test, eai_narray_get_test, eai_narray_get_ref_test, eai_narray_shape_test, eai_narray_iter_test

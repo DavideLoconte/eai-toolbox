@@ -6,13 +6,12 @@
 
 #include <eai_profile.h>
 
-bool eai_profile_test_wall_clock(void)
+void eai_profile_test_wall_clock(void)
 {
     utest_assert_float(eai_profile_get_wall_clock(), >, 0);
-    return true;
 }
 
-bool eai_profile_test_rss(void)
+void eai_profile_test_rss(void)
 {
     ulib_uint x = eai_profile_get_resident_memory();
     utest_assert_uint(x, >, 0);
@@ -34,10 +33,9 @@ bool eai_profile_test_rss(void)
     utest_assert_uint(x3, >=, 2048); //  Process occupies at least 2 MB
     free(abc2);
     free(abc);
-    return true;
 }
 
-bool eai_profile_test_sleep(void)
+void eai_profile_test_sleep(void)
 {
     ulib_float epsilon = 0.2;
     ulib_uint seconds = 1;
@@ -47,6 +45,4 @@ bool eai_profile_test_sleep(void)
 
     utest_assert_float((stop - start), >, seconds - epsilon);
     utest_assert_float((stop - start), <, seconds + epsilon);
-
-    return true;
 }
