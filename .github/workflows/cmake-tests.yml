@@ -17,22 +17,25 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.build_config}}
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build
-      
+
       - name: Build Tests
         run: cmake --build ${{github.workspace}}/build --target eai-toolbox-test
-    
+
       - name: Build ASAN Tests
         if: matrix.os != 'windows-latest'
         run: cmake --build ${{github.workspace}}/build --target eai-toolbox-test-asan
-    
+
       - name: Execute Tests on Windows
         if: matrix.os == 'windows-latest'
         run: ${{github.workspace}}\build\${{env.BUILD_TYPE}}\eai-toolbox-test.exe

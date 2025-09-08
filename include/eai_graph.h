@@ -165,16 +165,16 @@ EAI_BEGIN_DECLS
             g->flags = ubit_set(8, EAI_GRAPH_DUPLICATE, g->flags);                                 \
             return false;                                                                          \
         }                                                                                          \
-        uvec_ret retA = uvec_push(EaiGraphNode_##T, &g->nodes, n);                                 \
+        ulib_ret retA = uvec_push(EaiGraphNode_##T, &g->nodes, n);                                 \
                                                                                                    \
-        if(retA != UVEC_OK) {                                                                      \
+        if(retA != ULIB_OK) {                                                                      \
             g->flags = ubit_set(8, EAI_GRAPH_MEM_ERROR, g->flags);                                 \
             return false;                                                                          \
         }                                                                                          \
                                                                                                    \
         UVec(EaiGraphEdgeEntry_##T) x = uvec(EaiGraphEdgeEntry_##T);                               \
-        uvec_ret retB = uvec_push(EaiGraphEdgeList_##T, &g->edges, x);                             \
-        if(retB != UVEC_OK) {                                                                      \
+        ulib_ret retB = uvec_push(EaiGraphEdgeList_##T, &g->edges, x);                             \
+        if(retB != ULIB_OK) {                                                                      \
             uvec_remove(EaiGraphNode_##T, &g->nodes, n);                                           \
             uvec_deinit(EaiGraphEdgeEntry_##T, &x);                                                \
             g->flags = ubit_set(8, EAI_GRAPH_MEM_ERROR, g->flags);                                 \
@@ -202,11 +202,11 @@ EAI_BEGIN_DECLS
         edge.val = val;                                                                            \
         edge.to = uvec_index_of(EaiGraphNode_##T, &g->nodes, end);                                 \
                                                                                                    \
-        uvec_ret ret = uvec_insert_sorted(EaiGraphEdgeEntry_##T,                                   \
+        ulib_ret ret = uvec_sorted_insert(EaiGraphEdgeEntry_##T,                                   \
                                           &uvec_data(EaiGraphEdgeList_##T, &g->edges)[idx],        \
                                           edge,                                                    \
-                                            NULL);                                                   \
-        if(ret == UVEC_OK)                                                                         \
+                                          NULL);                                                   \
+        if(ret == ULIB_OK)                                                                         \
             return true;                                                                           \
         g->flags = ubit_set(8, EAI_GRAPH_MEM_ERROR, g->flags);                                     \
         return false;                                                                              \
@@ -255,7 +255,7 @@ EAI_BEGIN_DECLS
                                                                                                    \
         UVec(EaiGraphEdgeEntry_##T) *edges = &uvec_data(EaiGraphEdgeList_##T,                      \
                                                         &g->edges)[start_idx];                     \
-        ulib_uint edge_idx = uvec_index_of_sorted(EaiGraphEdgeEntry_##T, edges, new);              \
+        ulib_uint edge_idx = uvec_sorted_index_of(EaiGraphEdgeEntry_##T, edges, new);              \
                                                                                                    \
         if(!uvec_index_is_valid(EaiGraphEdgeEntry_##T, edges, edge_idx)) {                         \
             g->flags = ubit_set(8, EAI_GRAPH_NOT_FOUND, g->flags);                                 \
@@ -287,7 +287,7 @@ EAI_BEGIN_DECLS
                                                                                                    \
         UVec(EaiGraphEdgeEntry_##T) *edges = &uvec_data(EaiGraphEdgeList_##T,                      \
                                                         &g->edges)[start_idx];                     \
-        ulib_uint edge_idx = uvec_index_of_sorted(EaiGraphEdgeEntry_##T, edges, dummy);            \
+        ulib_uint edge_idx = uvec_sorted_index_of(EaiGraphEdgeEntry_##T, edges, dummy);            \
                                                                                                    \
         if(!uvec_index_is_valid(EaiGraphEdgeEntry_##T, edges, edge_idx)) {                         \
             g->flags = ubit_set(8, EAI_GRAPH_NOT_FOUND, g->flags);                                 \
@@ -352,7 +352,7 @@ EAI_BEGIN_DECLS
                                                                                                    \
         UVec(EaiGraphEdgeEntry_##T) *edges = &uvec_data(EaiGraphEdgeList_##T,                      \
                                                         &g->edges)[start_idx];                     \
-        ulib_uint edge_idx = uvec_index_of_sorted(EaiGraphEdgeEntry_##T, edges, dummy);            \
+        ulib_uint edge_idx = uvec_sorted_index_of(EaiGraphEdgeEntry_##T, edges, dummy);            \
                                                                                                    \
         if(!uvec_index_is_valid(EaiGraphEdgeEntry_##T, edges, edge_idx)) {                         \
             g->flags = ubit_set(8, EAI_GRAPH_NOT_FOUND, g->flags);                                 \
@@ -382,7 +382,7 @@ EAI_BEGIN_DECLS
                                                                                                    \
         UVec(EaiGraphEdgeEntry_##T) *edges = &uvec_data(EaiGraphEdgeList_##T,                      \
                                                         &g->edges)[start_idx];                     \
-        ulib_uint edge_idx = uvec_index_of_sorted(EaiGraphEdgeEntry_##T, edges, dummy);            \
+        ulib_uint edge_idx = uvec_sorted_index_of(EaiGraphEdgeEntry_##T, edges, dummy);            \
         return uvec_index_is_valid(EaiGraphEdgeEntry_##T, edges, edge_idx);                        \
     }                                                                                              \
                                                                                                    \

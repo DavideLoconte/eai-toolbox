@@ -110,9 +110,9 @@ static void eai_csv_emit_field(EaiCsvReader *r);
  * @param r the reader
  * @param start the starting position in the buffer
  * @param end the ending position in the buffer
- * @return uvec_ret the result of uvec_push into the record
+ * @return ulib_ret the result of uvec_push into the record
  */
-static uvec_ret eai_csv_emit_field_between(EaiCsvReader *r, ulib_uint start, ulib_uint end);
+static ulib_ret eai_csv_emit_field_between(EaiCsvReader *r, ulib_uint start, ulib_uint end);
 
 /**
  * Read the current field between double quotes
@@ -190,7 +190,7 @@ EaiCsvReaderError eai_csv_reader_state(EaiCsvReader *reader) { return reader->_f
 UVec(UString) * eai_csv_reader_start(EaiCsvReader *r, UIStream *istream)
 {
     eai_csv_reader_reset(r);
-    uvec_remove_all(UString, &r->_rec);
+    uvec_clear(UString, &r->_rec);
     r->_stream = istream;
     eai_csv_reader_fill_buffer(r, 0);
     return eai_csv_reader_emit_record(r);
@@ -200,7 +200,7 @@ UVec(UString) * eai_csv_reader_next(EaiCsvReader *r)
 {
     if(eai_csv_reader_end(r))
         return NULL;
-    uvec_remove_all(UString, &r->_rec);
+    uvec_clear(UString, &r->_rec);
     eai_csv_reader_rotate(r);
     return eai_csv_reader_emit_record(r);
 }
@@ -317,9 +317,9 @@ static void eai_csv_reader_fill_buffer(EaiCsvReader *r, size_t from)
 
     size_t read;
     size_t count = r->_bufsize - (from + 1);
-    ustream_ret ret = uistream_read(r->_stream, r->_buf + from, count, &read);
+    ulib_ret ret = uistream_read(r->_stream, r->_buf + from, count, &read);
 
-    if(ret != USTREAM_OK) {
+    if(ret != ULIB_OK) {
         r->_flags = ubit_set(8, r->_flags, EAI_CSV_READER_STREAM_ERROR);
     }
 
@@ -351,7 +351,7 @@ static void eai_csv_reader_advance(EaiCsvReader *r)
         // Move references on realloc
         if(oldbuf != r->_buf) {
             ulib_uint i, lastsep = (ulib_uint) -1;
-            uvec_remove_all(UString, &r->_rec);
+            uvec_clear(UString, &r->_rec);
             for(i = 0; i < r->_bufpos; i++) {
                 if(r->_buf[i] == EAI_CSV_NULL_TERMINATOR) {
                     eai_csv_emit_field_between(r, lastsep + 1, i);
@@ -376,15 +376,15 @@ static void eai_csv_reader_rotate(EaiCsvReader *r)
 static void eai_csv_emit_field(EaiCsvReader *r)
 {
     r->_buf[r->_bufpos] = EAI_CSV_NULL_TERMINATOR;
-    uvec_ret ret = eai_csv_emit_field_between(r, r->_lastsep + 1, r->_bufpos);
-    if(ret != UVEC_OK) {
+    ulib_ret ret = eai_csv_emit_field_between(r, r->_lastsep + 1, r->_bufpos);
+    if(ret != ULIB_OK) {
         r->_flags = ubit_set(8, r->_flags, EAI_CSV_READER_VEC_ERROR);
     }
     r->_lastsep = r->_bufpos;
     eai_csv_reader_advance(r);
 }
 
-static uvec_ret eai_csv_emit_field_between(EaiCsvReader *r, ulib_uint start, ulib_uint end)
+static ulib_ret eai_csv_emit_field_between(EaiCsvReader *r, ulib_uint start, ulib_uint end)
 {
     UString field;
     field = ustring_wrap(r->_buf + start, end - start);

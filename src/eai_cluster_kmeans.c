@@ -189,7 +189,7 @@ static ulib_float eai_kmeans_distance_update(EaiKMeans *model, EaiNArray(ulib_fl
 {
     ulib_float sum = 0;
 
-    uvec_remove_all(ulib_float, distances);
+    uvec_clear(ulib_float, distances);
     eai_narray_foreach(ulib_float, data, sample)
     {
         ulib_float min_cluster_dist = ULIB_FLOAT_MAX;
@@ -211,7 +211,7 @@ static ulib_float eai_kmeans_distance_update(EaiKMeans *model, EaiNArray(ulib_fl
 
 static ulib_uint eai_kmeans_select_cluster_from_distance(UVec(ulib_float) *distances, ulib_float sum, UVec(ulib_uint) *bag)
 {
-    uvec_remove_all(ulib_uint, bag);
+    uvec_clear(ulib_uint, bag);
     uvec_reserve(ulib_uint, bag, (ulib_uint) (sum + 1));
 
     uvec_foreach(ulib_float, distances, item) {

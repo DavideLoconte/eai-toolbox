@@ -38,8 +38,8 @@ void test_eai_csv_reader1(void)
     int expected_length[] = { 3, 3, 3, 3 };
 
     UIStream csv_stream;
-    ustream_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
-    utest_assert(ret == USTREAM_OK);
+    ulib_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
+    utest_assert(ret == ULIB_OK);
 
     // No CRLF
     EaiCsvReader reader = eai_csv_reader(',', false);
@@ -61,7 +61,7 @@ void test_eai_csv_reader1(void)
 
     // No CRLF
     ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str_crlf);
-    utest_assert(ret == USTREAM_OK);
+    utest_assert(ret == ULIB_OK);
     reader = eai_csv_reader(';', true);
 
     i = 0;
@@ -106,8 +106,8 @@ void test_eai_csv_reader2(void)
     ulib_uint i;
 
     UIStream csv_stream;
-    ustream_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
-    utest_assert(ret == USTREAM_OK);
+    ulib_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
+    utest_assert(ret == ULIB_OK);
 
     // No CRLF
     EaiCsvReader reader = eai_csv_reader('\t', false);
@@ -129,7 +129,7 @@ void test_eai_csv_reader2(void)
 
     // No CRLF
     ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str_crlf);
-    utest_assert(ret == USTREAM_OK);
+    utest_assert(ret == ULIB_OK);
     reader = eai_csv_reader('\t', true);
 
     i = 0;
@@ -175,8 +175,8 @@ void test_eai_csv_reader3(void)
     ulib_uint i;
 
     UIStream csv_stream;
-    ustream_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
-    utest_assert(ret == USTREAM_OK);
+    ulib_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
+    utest_assert(ret == ULIB_OK);
 
     // No CRLF
 
@@ -199,7 +199,7 @@ void test_eai_csv_reader3(void)
 
     // No CRLF
     ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str_crlf);
-    utest_assert(ret == USTREAM_OK);
+    utest_assert(ret == ULIB_OK);
     reader = eai_csv_reader(',', true);
 
     i = 0;
@@ -340,8 +340,8 @@ void test_eai_csv_reader_errors(void)
 {
     // Stream error
     UIStream csv_stream;
-    ustream_ret ret = uistream_from_string(&csv_stream, "\"");
-    utest_assert(ret == USTREAM_OK);
+    ulib_ret ret = uistream_from_string(&csv_stream, "\"");
+    utest_assert(ret == ULIB_OK);
 
     // No CRLF
     EaiCsvReader reader = eai_csv_reader(',', false);
@@ -386,8 +386,8 @@ void test_eai_csv_reader_header(void)
     int expected_length[] = { 3, 3, 3, 3 };
 
     UIStream csv_stream;
-    ustream_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
-    utest_assert(ret == USTREAM_OK);
+    ulib_ret ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str);
+    utest_assert(ret == ULIB_OK);
 
     // No CRLF
     EaiCsvReader reader = eai_csv_reader(',', false);
@@ -421,7 +421,7 @@ void test_eai_csv_reader_header(void)
 
     // No CRLF
     ret = uistream_from_string(&csv_stream, eai_csv_reader_test_str_crlf);
-    utest_assert(ret == USTREAM_OK);
+    utest_assert(ret == ULIB_OK);
     reader = eai_csv_reader(';', true);
 
     i = 0;

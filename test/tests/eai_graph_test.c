@@ -47,7 +47,6 @@ void eai_graph_test_2(void)
     utest_assert(!eai_graph_has_edge(test_graph, &graph, 4, 2));
     utest_assert(!eai_graph_has_edge(test_graph, &graph, 2, 4));
     eai_graph_deinit(test_graph, &graph);
-     
 }
 
 void eai_graph_test_3(void)

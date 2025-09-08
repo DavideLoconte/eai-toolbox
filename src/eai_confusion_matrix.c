@@ -51,8 +51,8 @@ void eai_confusion_matrix_add(EaiConfusionMatrix *matrix, ulib_uint actual, ulib
 
     while(EAI_MAX(actual, predicted) >= uvec_count(EaiConfusionMatrixRow, &matrix->matrix)) {
         row = uvec(ulib_uint);
-        uvec_ret ret = uvec_push(EaiConfusionMatrixRow, &matrix->matrix, row);
-        if(ret != UVEC_OK) {
+        ulib_ret ret = uvec_push(EaiConfusionMatrixRow, &matrix->matrix, row);
+        if(ret != ULIB_OK) {
             matrix->flags = ubit_set(8, matrix->flags, EAI_CONFUSION_MATRIX_VEC_ERR);
             return;
         }
@@ -60,8 +60,8 @@ void eai_confusion_matrix_add(EaiConfusionMatrix *matrix, ulib_uint actual, ulib
     row = uvec_get(EaiConfusionMatrixRow, &matrix->matrix, actual);
 
     while(predicted >= uvec_count(ulib_uint, &row)) {
-        uvec_ret ret = uvec_push(ulib_uint, &row, 0);
-        if(ret != UVEC_OK) {
+        ulib_ret ret = uvec_push(ulib_uint, &row, 0);
+        if(ret != ULIB_OK) {
             matrix->flags = ubit_set(8, matrix->flags, EAI_CONFUSION_MATRIX_VEC_ERR);
             return;
         }
